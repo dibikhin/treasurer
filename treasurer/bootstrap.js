@@ -1,61 +1,48 @@
-//const express = require('express');
 const mongodb = require('mongodb');
 
-const account = require('./models/account');
-const db = require('./db/db');
+const account_db_factory = require('./db/account_db');
+const account_factory = require('./models/account').default.default;
 
-//const app = express();
-
-let mdb;
-let accounts;
+const account_db = account_db_factory({
+    driver: mongodb,
+});
 
 console.info('Starting...');
 
-mongodb.MongoClient.connect('mongodb://localhost:27017/test')
-    .then(_db => {
-        mdb = _db.db('test');
-        accounts = mdb.collection('accounts');
-        // const account123 = {
-        //   amount: mongodb.Decimal128.fromString('125.125'),
-        //   threshold: mongodb.Decimal128.fromString('0.125'),
-        //   state: 'active',
-        //   deleted: false,
-        //   created_at: new Date(),
-        //   updated_at: null
-        // };
-        // mdb.collection('accounts').insertOne(account123);
-
-        console.log('Connected successfully to server');
-
-        const ctx = {
-            driver: mongodb,
-            db: db,
-            collection: accounts
-        };
+account_db
+    .init({
+        mongo_url: 'mongodb://localhost:27017',
+        db_name: 'test',
+        collection_name: 'accounts'
+    })
+    .then(x => {
+        const account = account_factory({
+            db: account_db
+        });
 
         let params = {
             account_id: '5a885459ef5fa013c0abf723'
         };
 
-        account.balance(ctx, params, (err, balance) => {
-            console.info(err || 'no error');
+        account.balance(params, (err, balance) => {
+            if (err) { console.error(err); }
             console.info(balance.toString());
 
             params.spending = '0.125';
 
-            account.withdraw(ctx, params, (err, acc) => {
-                console.info(err || 'no error');
-                console.info(acc);
+            account.withdraw(params, (err, acc) => {
+                if (err) { console.error(err); }
+                console.info(acc.value.amount.toString());
 
                 params.refill = '1.0';
 
-                account.deposit(ctx, params, (err, acc) => {
-                    console.info(err || 'no error');
-                    console.info(acc);
-    
+                account.deposit(params, (err, acc) => {
+                    if (err) { console.error(err); }
+                    console.info(acc.value.amount.toString());
+
+                    console.info('Finished.');
                     process.exit(0);
                 });
             });
         });
-    })
-    .catch(error => console.error('error', error));
+    });

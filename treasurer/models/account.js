@@ -1,56 +1,73 @@
-module.exports = {
-    balance: balance,
-    deposit: deposit,
-    withdraw: withdraw,
-    transfer: transfer
-};
+/**
+ * Account's domain model
+ * Account stores users' balance and keeps it above threshold
+ * @module account
+ */
+
+module.exports = account_factory;
 
 /**
- * Get funds
- * 
- * @param {object} ctx Context, everything needed
- * @param {object} params
- * @param {function} callback 
+ * Account factory
+ * @param {object} ctx Params for injection
+ * @returns {object} armed module
  */
-function balance(ctx, params, callback) {
-    ctx.db.get_amount(ctx, params, callback);
-}
+function account_factory(ctx) {
+    let db;
 
-/**
- * Store funds
- * 
- * @param {object} ctx Context, everything needed
- * @param {object} params
- * @param {function} callback 
- */
-function deposit(ctx, params, callback) {
-    ctx.db.inc_amount(ctx, params, callback);
-}
+    if (!ctx || !ctx.db) {
+        throw new Error('ctx.db is required');
+    }
 
-/**
- * Spend funds
- * 
- * @param {object} ctx Context, everything needed
- * @param {object} params
- * @param {function} callback 
- */
-function withdraw(ctx, params, callback) {
-    ctx.db.dec_amount(ctx, params, callback);
-}
+    db = ctx.db;
 
-/**
- * Move funds to another account
- * 
- * @param {object} ctx Context, everything needed
- * @param {object} params
- * @param {function} callback 
- */
-function transfer(ctx, callback) {
-    ctx.db.get_balance(ctx.account_id, acc_from => {
-        ctx.db.dec_balance(ctx.account_id, acc_from_dec => {
-            ctx.db.inc_balance(ctx.account_id, acc_to_inc => {
-                return callback(null, { a: 0.4 });
+    return {
+        balance: balance,
+        deposit: deposit,
+        withdraw: withdraw,
+        transfer: transfer
+    };
+
+    /**
+     * Get balance
+     * @param {object} params
+     * @param {function} done Callback
+     */
+    function balance(params, done) {
+        return db.get_balance(params, done);
+    }
+
+    /**
+     * Store funds
+     * @param {object} params
+     * @param {function} done Callback
+     */
+    function deposit(params, done) {
+        return db.inc_balance(params, done);
+    }
+
+    /**
+     * Spend funds
+     * @param {object} params
+     * @param {function} done Callback
+     */
+    function withdraw(params, done) {
+        return db.dec_balance(params, done);
+    }
+
+    /**
+     * Move funds to another account
+     * @param {object} params
+     * @param {function} done Callback
+     */
+    function transfer(params, done) {
+        return db.get_balance(params, acc_from => {
+            // check
+            db.dec_balance(params, acc_from_dec => {
+                db.inc_balance(params, (err, data => {
+                    // refund on fail
+                    done(err, data);
+                }));
             });
         });
-    });
+    }
 }
