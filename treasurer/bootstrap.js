@@ -1,7 +1,7 @@
 const mongodb = require('mongodb');
 
 const account_db_factory = require('./db/account_db');
-const account_factory = require('./models/account').default.default;
+const account_factory = require('./models/account');
 
 const account_db = account_db_factory({
     driver: mongodb,
