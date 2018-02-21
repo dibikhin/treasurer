@@ -1,5 +1,31 @@
-# Acckeeper
-Users' accounts storage service (funds balance)
+# Treasurer
+Managing accounts' balances. A billing's core subsystem.
+
+## Motivation
+
+Suppose you have a chargeable service with some users and they pay you money. You need to store their amounts of money and charge them for using your service. And users should spend only money they have.
+
+Treasurer operates on that.
+
+## Features
+
+Treasurer stores balances, deposits and withdraws funds, transfers funds between accounts.
+
+Use Treasurer in telecom, messaging, payment systems, online games and shops.
+
+You can store balances using a specific currency or abstract points.
+
+It does:
+* Created simple and well documented
+* Operates syncronously
+* Scales horisontally on each layer
+* Works fast, reliably, fault-tolerant
+* Serves transparently
+* Uses precise 128-bit IEEE 754-2008 decimal
+
+It doesn't:
+* Keep record of every balance movement
+* Operates asynchronously
 
 ## Domain model
 
@@ -8,12 +34,25 @@ Users' accounts storage service (funds balance)
 | User     | User of the system  |
 | Funds     | User's money  |
 | Account     | Record for keeping User's funds ('money balance')  |
-| Amount     | Signed decimal amount of funds in Account  |
+| Balance     | Signed decimal amount of funds in Account  |
 | Threshold     | Lower limit of available funds (e.g. zero) |
+| Overdraft? |  |
+| Credit? |  |
+| Currency code | by standard |
+| Accuracy? | Digits after zero |
+
+### Account attributes
+
+| Attribute  | Desc              |
+| -------- | ------------------- |
+| State | active / suspended |
+| Deleted | true / false |
+| Created At UTC |  |
+| Updated At UTC |  |
 
 ## Rules
 
-* Amount in Account always should be above Threshold (before and after spending)
+* Balance in Account should be above Threshold (before and after spending)
 * Each spending should be charged in Account (and only once, and immidiately)
 
 ## Features
@@ -26,11 +65,11 @@ Users' accounts storage service (funds balance)
 
 #### Scenario 1: Funds should be increased after deposit  
 
-*Given that* User's account has a zero amount  
+*Given that* User's account has zero balance  
 *And* the account is active  
 *And* the account is not deleted  
 *When* the User tries to deposit the amount of money  
-*Then* the account's amount should be increased by the amount  
+*Then* the account's balance should be increased by the amount  
 
 ### Story: Funds withdrawal
 
@@ -40,43 +79,52 @@ Users' accounts storage service (funds balance)
 
 #### Scenario 1: Funds above threshold should be withdrawn  
 
-*Given that* User's account has an amount above threshold  
+*Given that* User's account has balance above threshold  
 *And* the account is active  
 *And* the account is not deleted  
-*And* the amount minus spending is above threshold  
+*And* the balance minus spending is above threshold  
 *When* the User tries to spend the amount of money  
-*Then* the account's amount should be reduced by the amount  
+*Then* the account's balance should be reduced by the amount  
 
 #### Scenario 2: Funds below threshold should not be withdrawn
 
-*Given that* User's account has an amount below threshold  
+*Given that* User's account has balance below threshold  
 *And* the account is active  
 *And* the account is not deleted  
 *When* the user tries to spend the amount of money  
-*Then* the account's amount should not be changed  
+*Then* the account's balance should not be changed  
 
 #### Scenario 3: Funds above threshold should stay above threshold
 
-*Given that* User's account has an amount above threshold  
+*Given that* User's account has balance above threshold  
 *And* the account is active  
 *And* the account is not deleted  
 *And* the amount minus spending is below threshold  
 *When* the User tries to spend the amount of money  
-*Then* the account's amount should not be changed  
+*Then* the account's balance should not be changed  
 
 ## Requirements
 * .NET Core
 * Node.js
 
 ## Components
+* accounts_api. API for managing Balance and Account CRUD
 * TestApi. Dummy web app at http://localhost:5000. Returns a string on `GET /`
 * FuncTester. Console app. Pings http://localhost:5000/ and prints result to console.
+
+## Accounts API
+
+### Balance endpoint
+Get balance, deposit, withdraw, transfer.
+
+### Account endpoint
+CRUD. Excluding Account.Balance.
 
 ## Guide
 Start TestApi then start FuncTester. The terminal should be flooded with ping messages.
 
 ### Starting TestApi
-Open a terminal in Acckeeper's folder, then:
+Open a terminal in Treasurer's folder, then:
 
 ``` 
 cd TestApi
@@ -89,7 +137,7 @@ dotnet run
 Look at the terminal.
 
 ### Starting FuncTester
-Open another terminal in Acckeeper's folder, then:
+Open another terminal in Treasurer's folder, then:
 
 ``` 
 cd FuncTester
