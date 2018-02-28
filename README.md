@@ -17,15 +17,15 @@ You can store balances using a specific currency or abstract points.
 
 It does:
 * Created simple and well documented
-* Operates syncronously
-* Scales horisontally on each layer
-* Works fast, reliably, fault-tolerant
-* Serves transparently
-* Uses precise 128-bit IEEE 754-2008 decimal
+* Operate syncronously
+* Scale horisontally on each layer
+* Work fast, reliably, fault-tolerant
+* Serve transparently
+* Use precise 128-bit IEEE 754-2008 decimal
 
 It doesn't:
 * Keep record of every balance movement
-* Operates asynchronously
+* Operate asynchronously
 
 ## Domain model
 

@@ -1,9 +1,13 @@
+const benalu = require('benalu');
 const mongodb = require('mongodb');
+
+const create_callback_advice = require('./infrastructure/advice/callback_advice');
+const is_callback_valid = require('./infrastructure/aspects/callback_validator');
 
 const helpers = require('./infrastructure/helpers');
 
-const accounts_db_factory = require('./infrastructure/accounts_db_factory');
-const accounts_model_factory = require('./infrastructure/accounts_model_factory');
+const accounts_db_factory = require('./infrastructure/factories/accounts_db_factory');
+const accounts_model_factory = require('./infrastructure/factories/accounts_model_factory');
 
 const accounts_model_module = require('./models/accounts');
 const accounts_db_module = require('./db/accounts');
@@ -29,14 +33,21 @@ accounts_db
     });
 
 function run() {
-    const accounts = accounts_model_factory({
+    const accounts_unwrapped = accounts_model_factory({
         helpers: helpers,
         db: accounts_db,
         module: accounts_model_module
     });
+
     let params = {
-        account_id: '5a885459ef5fa013c0abf723'
+        account_id: '5a885459ef5fa013c0abf723' // mongodb.ObjectID.isValid('zxcv');
     };
+
+    const accounts = benalu
+        .fromInstance(accounts_unwrapped)
+        .addInterception(create_callback_advice(is_callback_valid))
+        .build();
+
     accounts.balance(params, (err, balance) => {
         if (err) {
             console.error(err);
@@ -48,6 +59,7 @@ function run() {
                 console.error(err);
             }
             console.info(acc.value.amount.toString());
+            params.spending = null;
             params.refill = '1.0';
             accounts.deposit(params, (err, acc) => {
                 if (err) {
