@@ -1,16 +1,16 @@
 const benalu = require('benalu');
 const mongodb = require('mongodb');
 
-const create_callback_advice = require('./infrastructure/advice/callback_advice');
-const is_callback_valid = require('./infrastructure/aspects/callback_validator');
+const create_callback_advice = require('infrastructure/advice/callback_advice');
+const is_callback_valid = require('infrastructure/aspects/callback_validator');
 
-const helpers = require('./infrastructure/helpers');
+const helpers = require('infrastructure/helpers');
 
-const accounts_db_factory = require('./infrastructure/factories/accounts_db_factory');
-const accounts_model_factory = require('./infrastructure/factories/accounts_model_factory');
+const accounts_db_factory = require('infrastructure/factories/accounts_db_factory');
+const accounts_model_factory = require('infrastructure/factories/accounts_model_factory');
 
-const accounts_model_module = require('./models/accounts');
-const accounts_db_module = require('./db/accounts');
+const accounts_model_module = require('models/accounts');
+const accounts_db_module = require('db/accounts');
 
 const accounts_db = accounts_db_factory({
     helpers: helpers,

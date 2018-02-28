@@ -4,7 +4,7 @@
   "description": "",
   "main": "bootstrap.js",
   "scripts": {
-    "start": "node --use_strict bootstrap.js",
+    "start": "NODE_PATH=./lib node --use_strict bootstrap.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
