@@ -6,16 +6,17 @@ const is_callback_valid = require('infrastructure/aspects/callback_validator');
 
 const helpers = require('infrastructure/helpers');
 
-const accounts_db_factory = require('infrastructure/factories/accounts_db_factory');
-const accounts_model_factory = require('infrastructure/factories/accounts_model_factory');
+const generic_factory = require('infrastructure/factories/generic_factory');
 
 const accounts_model_module = require('models/accounts');
-const accounts_db_module = require('db/accounts');
+const accounts_db_adapter = require('db/accounts_db_adapter');
 
-const accounts_db = accounts_db_factory({
+const accounts_db = generic_factory({
     helpers: helpers,
-    driver: mongodb,
-    module: accounts_db_module
+    module: accounts_db_adapter,
+    target_context: {
+        driver: mongodb
+    }
 });
 
 console.info('Starting...');
@@ -33,10 +34,12 @@ accounts_db
     });
 
 function run() {
-    const accounts_unwrapped = accounts_model_factory({
+    const accounts_unwrapped = generic_factory({
         helpers: helpers,
-        db: accounts_db,
-        module: accounts_model_module
+        module: accounts_model_module,
+        target_context: {
+            db: accounts_db
+        }
     });
 
     let params = {

@@ -1,6 +1,6 @@
 /**
- * Account's DB
- * @module accounts_db
+ * Account's DB Adapter
+ * @module accounts_db_adapter
 */
 
 module.exports = {
@@ -95,6 +95,6 @@ function dec_balance(params, done) {
                     updated_at: true
                 }
             },
-            { new: true },
+            { new: true }, // return updated doc
             done);
 }
