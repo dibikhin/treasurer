@@ -1,7 +1,7 @@
 /**
  * Generic Factory
  * Binds context to a new module created using existing one
- * @module accounts_factory
+ * @module generic_factory
  */
 
 module.exports = generic_factory;
@@ -9,7 +9,7 @@ module.exports = generic_factory;
 /**
  * Generic Factory
  * @param {object} ctx Params for injection
- * @returns {object} binded module
+ * @returns {object} New binded module
  */
 function generic_factory(ctx) {
     if (!ctx || !ctx.module || !ctx.helpers || !ctx.target_context) {

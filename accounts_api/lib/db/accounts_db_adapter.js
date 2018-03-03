@@ -4,10 +4,10 @@
 */
 
 module.exports = {
-    init: init,
-    get_balance: get_balance,
-    inc_balance: inc_balance,
-    dec_balance: dec_balance
+    init,
+    get_balance,
+    inc_balance,
+    dec_balance
 };
 
 /**
@@ -27,17 +27,18 @@ function init(opts) {
             this.accounts = db.collection(opts.collection_name);
 
             console.log('Connected successfully to server');
-
-            // const account123 = {
-            //   amount: this.driver.Decimal128.fromString('125.125'),
-            //   threshold: this.driver.Decimal128.fromString('0.125'),
-            //   state: 'active',
-            //   deleted: false,
-            //   created_at: new Date(),
-            //   updated_at: null
-            // };
-            // accounts.insertOne(account123);
         })
+        // .then(() => {
+        //     const account123 = {
+        //         balance: this.driver.Decimal128.fromString('125.125'),
+        //         threshold: this.driver.Decimal128.fromString('0.125'),
+        //         state: 'active',
+        //         deleted: false,
+        //         created_at: new Date(),
+        //         updated_at: new Date()
+        //     };
+        //     this.accounts.insertOne(account123);
+        // })
         .catch(err => console.error('error', err));
 }
 
@@ -47,11 +48,12 @@ function init(opts) {
  * @param {function} done Callback
  */
 function get_balance(params, done) {
-    return this.accounts
+    this.accounts
         .findOne(
             new this.driver.ObjectID(params.account_id),
-            (err, acc) => {
-                return done(err, acc.amount);
+            (err, account) => {
+                if (!account) return done('nothing found', null);
+                return done(err, account);
             });
 }
 
@@ -61,13 +63,13 @@ function get_balance(params, done) {
  * @param {function} done Callback
  */
 function inc_balance(params, done) {
-    return this.accounts
+    this.accounts
         .findAndModify(
             { '_id': new this.driver.ObjectID(params.account_id) },
             [],
             {
                 $inc: {
-                    amount: this.driver.Decimal128.fromString(params.refill)
+                    balance: this.driver.Decimal128.fromString(params.incoming)
                 },
                 $currentDate: {
                     updated_at: true
@@ -83,13 +85,13 @@ function inc_balance(params, done) {
  * @param {function} done Callback
  */
 function dec_balance(params, done) {
-    return this.accounts
+    this.accounts
         .findAndModify(
             { '_id': new this.driver.ObjectID(params.account_id) },
             [],
             {
                 $inc: {
-                    amount: this.driver.Decimal128.fromString('-' + params.spending) // dirty minus
+                    balance: this.driver.Decimal128.fromString('-' + params.outgoing) // dirty minus
                 },
                 $currentDate: {
                     updated_at: true
