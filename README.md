@@ -34,14 +34,17 @@ It doesn't:
 | User     | User of the system  |
 | Funds     | User's money  |
 | Account     | Record for keeping User's funds ('money balance')  |
+
+### Account attributes
+
+| Attribute  | Desc              |
+| -------- | ------------------- |
 | Balance     | Signed decimal amount of funds in Account  |
 | Threshold     | Lower limit of available funds (e.g. zero) |
 | Overdraft? |  |
 | Credit? |  |
 | Currency code | by standard |
 | Accuracy? | Digits after zero |
-
-### Account attributes
 
 | Attribute  | Desc              |
 | -------- | ------------------- |
@@ -50,10 +53,12 @@ It doesn't:
 | Created At UTC |  |
 | Updated At UTC |  |
 
+
 ## Rules
 
-* Balance in Account should be above Threshold (before and after spending)
-* Each spending should be charged in Account (and only once, and immidiately)
+* Account's Balance should be above Threshold (before and after spending)
+* Each spending should be made in Account (and only once, and immidiately)
+* Each storing should be made in Account (and only once, and immidiately)
 
 ## Features
 
