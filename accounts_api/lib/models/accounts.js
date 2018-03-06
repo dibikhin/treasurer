@@ -13,12 +13,14 @@ module.exports = {
 
 /**
  * Gets balance
+ * @param {object}      ctx                 Injected params
+ * @param {object}      ctx.db_adapter
  * @param {object}      params
  * @param {ObjectID}    params.account_id
  * @param {function}    done                Callback
  */
-function balance(params, done) {
-    this.db.get_balance(params,
+function balance(ctx, params, done) {
+    ctx.db_adapter.get_balance(ctx, params,
         (err, account) => {
             return done(err, {
                 value: account // due to other functions
@@ -28,35 +30,40 @@ function balance(params, done) {
 
 /**
  * Stores funds
- * @param {object} params
+ * @param {object}      ctx                 Injected params
+ * @param {object}      ctx.db_adapter
+ * @param {object}      params
  * @param {ObjectID}    params.account_id
  * @param {string}      params.incoming     Decimal amount to store as string
  * @param {function}    done                Callback
  */
-function deposit(params, done) {
-    return this.db.inc_balance(params, done);
+function deposit(ctx, params, done) {
+    return ctx.db_adapter.inc_balance(ctx, params, done);
 }
 
 /**
  * Spends funds
+ * @param {object}      ctx                 Injected params
+ * @param {object}      ctx.db_adapter
  * @param {object}      params
  * @param {ObjectID}    params.account_id
  * @param {string}      params.outgoing     Decimal amount to spend as string
  * @param {function}    done                Callback
  */
-function withdraw(params, done) {
-    return this.db.dec_balance(params, done);
+function withdraw(ctx, params, done) {
+    return ctx.db_adapter.dec_balance(ctx, params, done);
 }
 
 /**
  * Moves funds to another account
+ * @param {object}      ctx             Injected params
  * @param {object}      params
  * @param {ObjectID}    params.from     Sender's account id
  * @param {ObjectID}    params.to       Reciever's account id
  * @param {string}      params.tranche  Decimal amount to transfer as string
  * @param {function}    done            Callback
  */
-function transfer(params, done) {
+function transfer(ctx, params, done) {
     const params_from = {
         account_id: params.from,
         outgoing: params.tranche
@@ -66,14 +73,14 @@ function transfer(params, done) {
         incoming: params.tranche
     };
 
-    this.db.get_balance(params_from, (err, acc_from) => {
+    balance(ctx, params_from, (err, acc_from) => {
         // check no err
         // check acc_from.value.balance > treshold
-        this.db.dec_balance(params_from, (err, acc_from_after_withdraw) => {
+        withdraw(ctx, params_from, (err, acc_from_after_withdraw) => {
             // if (err) return done(err, null);
-            this.db.inc_balance(params_to, (err, acc_to_after_deposit) => {
+            deposit(ctx, params_to, (err, acc_to_after_deposit) => {
                 if (err) console.error(err);
-                // deposit(params_from, (err, acc_from_after_deposit => {
+                // deposit(ctx, params_from, (err, acc_from_after_deposit => {
                 //     return done(err, acc_from_after_deposit); ?
                 // }));
 
