@@ -51,7 +51,16 @@ function deposit(ctx, params, done) {
  * @param {function}    done                Callback
  */
 function withdraw(ctx, params, done) {
-    return ctx.db_adapter.dec_balance(ctx, params, done);
+    balance(ctx, params, (err, data) => {
+        const payable_params = {
+            outgoing: params.outgoing,
+            account: data.value
+        };
+        if (!ctx.is_payable(payable_params)) {
+            return done('insufficient funds', null);
+        }
+        return ctx.db_adapter.dec_balance(ctx, params, done);
+    });
 }
 
 /**
@@ -73,21 +82,17 @@ function transfer(ctx, params, done) {
         incoming: params.tranche
     };
 
-    balance(ctx, params_from, (err, acc_from) => {
-        // check no err
-        // check acc_from.value.balance > treshold
-        withdraw(ctx, params_from, (err, acc_from_after_withdraw) => {
-            // if (err) return done(err, null);
-            deposit(ctx, params_to, (err, acc_to_after_deposit) => {
-                if (err) console.error(err);
-                // deposit(ctx, params_from, (err, acc_from_after_deposit => {
-                //     return done(err, acc_from_after_deposit); ?
-                // }));
+    withdraw(ctx, params_from, (err, acc_from_after_withdraw) => {
+        // if (err) return done(err, null);
+        deposit(ctx, params_to, (err, acc_to_after_deposit) => {
+            if (err) console.error(err);
+            // deposit(ctx, params_from, (err, acc_from_after_deposit => {
+            //     return done(err, acc_from_after_deposit); ?
+            // }));
 
-                return done(err, {
-                    from: acc_from_after_withdraw,
-                    to: acc_to_after_deposit
-                });
+            return done(err, {
+                from: acc_from_after_withdraw,
+                to: acc_to_after_deposit
             });
         });
     });

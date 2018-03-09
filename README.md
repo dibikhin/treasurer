@@ -125,6 +125,14 @@ Get balance, deposit, withdraw, transfer.
 ### Account endpoint
 CRUD. Excluding Account.Balance.
 
+### Caching rules
+Last value of balance should be cached for a while due to rule of keeping balance above threshold
+(each withdrawal starts with balance checking).
+* On balance: return cached value if TTL or return live version and add it to cache
+* On deposit: remove from cache
+* On withdraw: check balance
+* On transfer: check balance
+
 ## Guide
 Start TestApi then start FuncTester. The terminal should be flooded with ping messages.
 

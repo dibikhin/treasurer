@@ -1,6 +1,8 @@
 const benalu = require('benalu');
 const mongodb = require('mongodb');
 
+const threshold_strategy = require('business_rules/threshold_strategy');
+
 const create_callback_advice = require('infrastructure/advice/callback_advice');
 const is_callback_valid = require('infrastructure/aspects/callback_validator');
 
@@ -15,7 +17,8 @@ console.info('Starting...');
 // context_manager.accounts_ctx =
 const accounts_ctx = {
     driver: mongodb,
-    db_adapter: accounts_db_adapter_raw
+    db_adapter: accounts_db_adapter_raw,
+    is_payable: threshold_strategy
 };
 
 // config.js > mongo_config.js
@@ -48,24 +51,18 @@ function run_test(accounts_col) {
     // addInterception validate business rules
 
     accounts.balance(accounts_ctx, params, (err, data) => {
-        if (err) {
-            console.error(err);
-        }
+        if (err) { console.error(err); process.exit(0); }
         console.info(data.value.balance.toString());
 
         params.outgoing = '0.125';
         accounts.withdraw(accounts_ctx, params, (err, data) => {
-            if (err) {
-                console.error(err);
-            }
+            if (err) { console.error(err); process.exit(0); }
             console.info(data.value.balance.toString());
 
             params.outgoing = null;
             params.incoming = '1.0';
             accounts.deposit(accounts_ctx, params, (err, data) => {
-                if (err) {
-                    console.error(err);
-                }
+                if (err) { console.error(err); process.exit(0); }
                 console.info(data.value.balance.toString());
 
                 params = {
