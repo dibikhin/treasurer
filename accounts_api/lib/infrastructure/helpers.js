@@ -26,8 +26,8 @@ function get_account_id(invocation) {
     return invocation['1'].account_id;
 }
 
-function wrap(fn, interceptor) {
-    return new Proxy(fn, {
+function wrap(funktion, interceptor) {
+    return new Proxy(funktion, {
         apply: interceptor
     });
 }
