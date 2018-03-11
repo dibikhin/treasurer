@@ -5,19 +5,29 @@
  */
 
 module.exports = {
-    bind_to_context: bind_to_context
+    get_callback,
+    set_callback,
+    get_account_id,
+    wrap
 };
 
-/**
- * Binds each function in the object to another context
- * @param {object} raw_module A Node module
- * @param {object} target_context New context for the module's functions
- * @returns {object} A new module
- */
-function bind_to_context(raw_module, target_context) {
-    const binded_module = {};
-    for (const key in raw_module) {
-        binded_module[key] = raw_module[key].bind(target_context);
-    }
-    return binded_module;
+function get_callback(args) {
+    const callback_index = Object.keys(args).length - 1;
+    const callback = args[callback_index];
+    return callback;
+}
+
+function set_callback(args, new_callback) {
+    const callback_index = Object.keys(args).length - 1;
+    args[callback_index] = new_callback;
+}
+
+function get_account_id(invocation) {
+    return invocation['1'].account_id;
+}
+
+function wrap(fn, interceptor) {
+    return new Proxy(fn, {
+        apply: interceptor
+    });
 }
