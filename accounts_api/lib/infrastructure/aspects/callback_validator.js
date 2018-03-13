@@ -1,10 +1,10 @@
-module.exports = is_valid;
+module.exports = is_callback_valid;
 
 /**
  * Checks if callback valid
  * @param {object} args Arguments where to search and validate callback
  */
-function is_valid(ctx, args) {
+function is_callback_valid(ctx, args) {
     if (!args || typeof args !== 'object') {
         throw new Error('args is required');
     }

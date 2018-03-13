@@ -1,25 +1,21 @@
 module.exports = create;
 
 /**
- * Factory creating advice
- * @param {string} function_name    Function to catch
+ * Fancy caching factory
  */
 function create(ctx) {
-    function _callback_interceptor(target, that, args) {
-        const account = args[1];
-        ctx.cache.put(account._id, account);
-        return target.apply(null, args);
-    }
+    function caching_rules(invocation) {
+        function _callback_interceptor(target, that, args) {
+            const account = args[1];
+            ctx.cache.put(account._id, account);
+            return target.apply(null, args);
+        }
 
-    function inc_balance(invocation) {
         if (invocation.memberName === 'inc_balance') {
             const account_id = ctx.helpers.get_account_id(invocation.parameters);
             ctx.cache.del(account_id);
         }
-        invocation.proceed();
-    }
 
-    function get_balance(invocation) {
         if (invocation.memberName === 'get_balance') {
             const callback = ctx.helpers.get_callback(invocation.parameters);
             const account_id = ctx.helpers.get_account_id(invocation.parameters);
@@ -35,7 +31,6 @@ function create(ctx) {
         invocation.proceed();
     }
 
-    const caching_rules = { get_balance, inc_balance };
     return caching_rules;
 }
 
