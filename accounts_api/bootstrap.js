@@ -22,7 +22,7 @@ const accounts_db_bootstrap = require('db/accounts_db_bootstrap');
 
 console.info('Starting...');
 
-// TODO find lazy cache (on call expiry)
+// TODO find lazy (on call expiry) cache w/ function caching & callback substitution
 const cache = new Cache({ ttl: 30 * 1000 }); // TODO config
 
 const accounts_db_adapter = benalu
@@ -53,13 +53,13 @@ const conn_opts = {
     collection_name: 'accounts'
 };
 
-accounts_db_bootstrap
-    .init(accounts_ctx, conn_opts)
-    .then(run_test)
-    .catch(err => {
-        console.error('error', err);
-        process.exit(0);
-    });
+// accounts_db_bootstrap
+//     .init(accounts_ctx, conn_opts)
+//     .then(run_test)
+//     .catch(err => {
+//         console.error('error', err);
+//         process.exit(0);
+//     });
 
 function run_test(accounts_col) {
     accounts_ctx.db = { accounts: accounts_col };

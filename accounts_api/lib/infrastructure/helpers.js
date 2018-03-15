@@ -8,7 +8,7 @@ module.exports = {
     get_callback,
     set_callback,
     get_account_id,
-    wrap
+    wrap_function
 };
 
 function get_callback(args) {
@@ -26,7 +26,7 @@ function get_account_id(invocation) {
     return invocation['1'].account_id;
 }
 
-function wrap(funktion, interceptor) {
+function wrap_function(funktion, interceptor) {
     return new Proxy(funktion, {
         apply: interceptor
     });
