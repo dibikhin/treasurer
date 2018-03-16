@@ -1,0 +1,66 @@
+{
+    "balance": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "account_id": {
+                "mongo_object_id": true
+            }
+        },
+        "required": [
+            "account_id"
+        ]
+    },
+    "deposit": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "account_id": {
+                "mongo_object_id": true
+            },
+            "incoming": {
+                "type": "string"
+            }
+        },
+        "required": [
+            "account_id",
+            "incoming"
+        ]
+    },
+    "withdraw": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "account_id": {
+                "mongo_object_id": true
+            },
+            "outgoing": {
+                "type": "string"
+            }
+        },
+        "required": [
+            "account_id",
+            "outgoing"
+        ]
+    },
+    "transfer": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "from": {
+                "mongo_object_id": true
+            },
+            "to": {
+                "mongo_object_id": true
+            },
+            "tranche": {
+                "type": "string"
+            }
+        },
+        "required": [
+            "from",
+            "to",
+            "tranche"
+        ]
+    }
+}
