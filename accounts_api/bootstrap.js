@@ -3,6 +3,9 @@
  * @module bootstrap
  */
 
+const Ajv = require('ajv');
+const ajv = new Ajv({ allErrors: true });
+
 const benalu = require('benalu/benalu'); // self built, due to old npm
 const mongodb = require('mongodb');
 const Cache = require('ttl');
@@ -36,7 +39,73 @@ const accounts = benalu
     .addInterception(callback_validator_factory({ helpers }, is_callback_valid))
     .build();
 
-// addInterception validate business rules
+ajv.addKeyword('mongo_id', {
+    compile: function (schema) {
+        return data => mongodb.ObjectID.isValid(data);
+    }
+});
+
+const balance_schema = {
+    'type': 'object',
+    'properties': {
+        'account_id': { 'mongo_id': true },
+    },
+    'maxProperties': 1,
+    'required': ['account_id']
+};
+
+const deposit_schema = {
+    'type': 'object',
+    'properties': {
+        'account_id': { 'mongo_id': true },
+        'incoming': { 'type': 'string' } // decimal 0..zillion
+    },
+    'maxProperties': 2,
+    'required': ['account_id', 'incoming']
+};
+
+const withdraw_schema = {
+    'type': 'object',
+    'properties': {
+        'account_id': { 'mongo_id': true },
+        'outgoing': { 'type': 'string' } // decimal 0..zillion
+    },
+    'maxProperties': 2,
+    'required': ['account_id', 'outgoing']
+};
+
+const transfer_schema = {
+    'type': 'object',
+    'properties': {
+        'from': { 'mongo_id': true },
+        'to': { 'mongo_id': true },
+        'tranche': { 'type': 'string' } // decimal 0..zillion
+    },
+    'maxProperties': 3,
+    'required': ['from', 'to', 'tranche']
+};
+
+let validate = ajv.compile(balance_schema);
+console.log(validate({}));
+console.log('Invalid: ' + ajv.errorsText(validate.errors));
+console.log(validate({ account_id: '5a99b022b0a023125aaaae28' }));
+
+validate = ajv.compile(deposit_schema);
+console.log(validate({}));
+console.log('Invalid: ' + ajv.errorsText(validate.errors));
+console.log(validate({ account_id: '5a99b022b0a023125aaaae28', incoming: '1234.431' }));
+
+validate = ajv.compile(withdraw_schema);
+console.log(validate({ account_id: true }));
+console.log('Invalid: ' + ajv.errorsText(validate.errors));
+console.log(validate({ account_id: '5a99b022b0a023125aaaae28', outgoing: '1234.431' }));
+
+validate = ajv.compile(transfer_schema);
+console.log(validate({ from: 'qwer' }));
+console.log('Invalid: ' + ajv.errorsText(validate.errors));
+console.log(validate({ from: '5a99b022b0a023125aaaae28', to: '5a99b022b0a023125aaaae28', tranche: '1234.456' }));
+
+// addInterception validate business rules ?
 
 // TODO const contexts_manager = {};
 // contexts_manager.accounts_ctx =
