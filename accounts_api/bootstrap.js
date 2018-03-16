@@ -10,6 +10,8 @@ const benalu = require('benalu/benalu'); // self built, due to old npm
 const mongodb = require('mongodb');
 const Cache = require('ttl');
 
+const accounts_params_schemas = require('schemas/accounts_params.json');
+
 const threshold_strategy = require('business_rules/threshold_strategy');
 
 const caching_rules_factory = require('infrastructure/advice/caching_rules_factory');
@@ -34,76 +36,67 @@ const accounts_db_adapter = benalu
     .addInterception(caching_rules_factory({ helpers, cache })) // order matters, but how?
     .build();
 
-const accounts = benalu
-    .fromInstance(accounts_raw)
-    .addInterception(callback_validator_factory({ helpers }, is_callback_valid))
-    .build();
-
-ajv.addKeyword('mongo_id', {
-    compile: function (schema) {
+ajv.addKeyword('mongo_object_id', {
+    compile: schema => {
         return data => mongodb.ObjectID.isValid(data);
     }
 });
 
-const balance_schema = {
-    'type': 'object',
-    'properties': {
-        'account_id': { 'mongo_id': true },
+const accounts_params_validators = {};
+for (let schema_name in accounts_params_schemas) {
+    accounts_params_validators[schema_name] = ajv.compile(accounts_params_schemas[schema_name]);
+}
+
+const accounts = benalu
+    .fromInstance(accounts_raw)
+    .addInterception(callback_validator_factory({ helpers }, is_callback_valid))
+    .addInterception((invocation) => {
+        const validate = accounts_params_validators[invocation.memberName];
+        const params = invocation.parameters[1];
+        const valid = validate(params);
+        if (!valid) {
+            console.log();
+
+            console.log(invocation.memberName);
+            console.log(params);
+            console.log(valid);
+            console.log(validate.errors);
+        }
+        invocation.proceed();
+    })
+    .build();
+
+const schema = {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "account_id": {
+            "mongo_object_id": true
+        }
     },
-    'maxProperties': 1,
-    'required': ['account_id']
+    "required": [
+        "account_id"
+    ]
 };
 
-const deposit_schema = {
-    'type': 'object',
-    'properties': {
-        'account_id': { 'mongo_id': true },
-        'incoming': { 'type': 'string' } // decimal 0..zillion
-    },
-    'maxProperties': 2,
-    'required': ['account_id', 'incoming']
-};
+// const validate = ajv.compile(schema);
+// console.log(validate({
+//     account_id: '5a99b022b0a023125aaaae28',
+//     outgoing: null,
+//     amount: '-0.125',
+//     incoming: '1.0'
+// }));
+// console.log(ajv.errorsText(validate.errors));
 
-const withdraw_schema = {
-    'type': 'object',
-    'properties': {
-        'account_id': { 'mongo_id': true },
-        'outgoing': { 'type': 'string' } // decimal 0..zillion
-    },
-    'maxProperties': 2,
-    'required': ['account_id', 'outgoing']
-};
-
-const transfer_schema = {
-    'type': 'object',
-    'properties': {
-        'from': { 'mongo_id': true },
-        'to': { 'mongo_id': true },
-        'tranche': { 'type': 'string' } // decimal 0..zillion
-    },
-    'maxProperties': 3,
-    'required': ['from', 'to', 'tranche']
-};
-
-let validate = ajv.compile(balance_schema);
-console.log(validate({}));
-console.log('Invalid: ' + ajv.errorsText(validate.errors));
-console.log(validate({ account_id: '5a99b022b0a023125aaaae28' }));
-
-validate = ajv.compile(deposit_schema);
-console.log(validate({}));
-console.log('Invalid: ' + ajv.errorsText(validate.errors));
-console.log(validate({ account_id: '5a99b022b0a023125aaaae28', incoming: '1234.431' }));
-
-validate = ajv.compile(withdraw_schema);
-console.log(validate({ account_id: true }));
-console.log('Invalid: ' + ajv.errorsText(validate.errors));
-console.log(validate({ account_id: '5a99b022b0a023125aaaae28', outgoing: '1234.431' }));
-
-validate = ajv.compile(transfer_schema);
-console.log(validate({ from: 'qwer' }));
-console.log('Invalid: ' + ajv.errorsText(validate.errors));
-console.log(validate({ from: '5a99b022b0a023125aaaae28', to: '5a99b022b0a023125aaaae28', tranche: '1234.456' }));
+// for (let schema_name in accounts_params_schemas) {
+//     let validate = ajv.compile(accounts_params_schemas[schema_name]);
+//     console.log('');
+//     console.log(schema_name);
+//     console.log(validate({ account_id: '5a99b022b0a023125aaaae28' }));
+//     console.log(validate({ account_id: '5a99b022b0a023125aaaae28', incoming: '1234.431' }));
+//     console.log(validate({ account_id: '5a99b022b0a023125aaaae28', outgoing: '1234.431' }));
+//     console.log(validate({ from: '5a99b022b0a023125aaaae28', to: '5a99b022b0a023125aaaae28', tranche: '1234.456' }));
+// }
 
 // addInterception validate business rules ?
 
@@ -122,13 +115,13 @@ const conn_opts = {
     collection_name: 'accounts'
 };
 
-// accounts_db_bootstrap
-//     .init(accounts_ctx, conn_opts)
-//     .then(run_test)
-//     .catch(err => {
-//         console.error('error', err);
-//         process.exit(0);
-//     });
+accounts_db_bootstrap
+    .init(accounts_ctx, conn_opts)
+    .then(run_test)
+    .catch(err => {
+        console.error('error', err);
+        process.exit(0);
+    });
 
 function run_test(accounts_col) {
     accounts_ctx.db = { accounts: accounts_col };

@@ -49,7 +49,7 @@ function inc_balance(ctx, params, done) {
  * @param {function} done           Callback
  */
 function dec_balance(ctx, params, done) {
-    params.amount = '-' + params.outgoing;
+    params.amount = '-' + params.outgoing; // minus is for mongo
     _inc_balance(ctx, params, done);
 }
 
