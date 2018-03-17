@@ -9,7 +9,7 @@ function is_callback_valid(ctx, args) {
         throw new Error('args is required');
     }
     const callback = ctx.helpers.get_callback(args);
-    const is_function = typeof callback === 'function'; // TODO is_function
+    const is_function = typeof callback === 'function'; // TODO is_function 101 js
     const has_two_or_more_args = callback.length >= 2;
     const is_error_first_callback = is_function && has_two_or_more_args;
     if (!is_error_first_callback) {

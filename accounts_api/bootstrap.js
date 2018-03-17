@@ -16,8 +16,10 @@ const threshold_strategy = require('business_rules/threshold_strategy');
 
 const caching_rules_factory = require('infrastructure/advice/caching_rules_factory');
 const callback_validator_factory = require('infrastructure/advice/callback_validator_factory');
+const params_validator_factory = require('infrastructure/advice/params_validator_factory');
 
 const is_callback_valid = require('infrastructure/aspects/callback_validator');
+const is_params_valid = require('infrastructure/aspects/params_validator');
 
 const helpers = require('infrastructure/helpers');
 
@@ -37,10 +39,16 @@ const accounts_db_adapter = benalu
     .build();
 
 ajv.addKeyword('mongo_object_id', {
-    compile: schema => {
-        return data => mongodb.ObjectID.isValid(data);
-    }
+    compile: schema => data => mongodb.ObjectID.isValid(data)
 });
+
+ajv.addKeyword('is_frozen', {
+    compile: schema => data => Object.isFrozen(data)
+});
+
+// ajv.addKeyword('is_frozen_deep', {
+//     compile: schema => data => Object.isFrozen(data)
+// });
 
 const accounts_params_validators = {};
 for (let schema_name in accounts_params_schemas) {
@@ -50,53 +58,8 @@ for (let schema_name in accounts_params_schemas) {
 const accounts = benalu
     .fromInstance(accounts_raw)
     .addInterception(callback_validator_factory({ helpers }, is_callback_valid))
-    .addInterception((invocation) => {
-        const validate = accounts_params_validators[invocation.memberName];
-        const params = invocation.parameters[1];
-        const valid = validate(params);
-        if (!valid) {
-            console.log();
-
-            console.log(invocation.memberName);
-            console.log(params);
-            console.log(valid);
-            console.log(validate.errors);
-        }
-        invocation.proceed();
-    })
+    .addInterception(params_validator_factory({ accounts_params_validators }, is_params_valid))
     .build();
-
-const schema = {
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-        "account_id": {
-            "mongo_object_id": true
-        }
-    },
-    "required": [
-        "account_id"
-    ]
-};
-
-// const validate = ajv.compile(schema);
-// console.log(validate({
-//     account_id: '5a99b022b0a023125aaaae28',
-//     outgoing: null,
-//     amount: '-0.125',
-//     incoming: '1.0'
-// }));
-// console.log(ajv.errorsText(validate.errors));
-
-// for (let schema_name in accounts_params_schemas) {
-//     let validate = ajv.compile(accounts_params_schemas[schema_name]);
-//     console.log('');
-//     console.log(schema_name);
-//     console.log(validate({ account_id: '5a99b022b0a023125aaaae28' }));
-//     console.log(validate({ account_id: '5a99b022b0a023125aaaae28', incoming: '1234.431' }));
-//     console.log(validate({ account_id: '5a99b022b0a023125aaaae28', outgoing: '1234.431' }));
-//     console.log(validate({ from: '5a99b022b0a023125aaaae28', to: '5a99b022b0a023125aaaae28', tranche: '1234.456' }));
-// }
 
 // addInterception validate business rules ?
 
@@ -126,40 +89,39 @@ accounts_db_bootstrap
 function run_test(accounts_col) {
     accounts_ctx.db = { accounts: accounts_col };
 
-    let params = {
-        account_id: '5a99b022b0a023125aaaae28' // mongodb.ObjectID.isValid('zxcv');
-    };
+    const balance_params = Object.freeze({
+        account_id: '5a99b022b0a023125aaaae28'
+    });
 
-    accounts.balance(accounts_ctx, params, (err, data) => {
+    accounts.balance(accounts_ctx, balance_params, (err, data) => {
         if (err) { console.error(err); process.exit(0); }
         console.info('b1=' + data.value.balance.toString());
 
-        params.outgoing = '0.125';
-        accounts.withdraw(accounts_ctx, params, (err, data) => {
+        const withdraw_params = Object.freeze({ account_id: balance_params.account_id, outgoing: '0.125' });
+        accounts.withdraw(accounts_ctx, withdraw_params, (err, data) => {
             if (err) { console.error(err); process.exit(0); }
             console.info(data.value.balance.toString());
 
             setTimeout(() => {
-                accounts.balance(accounts_ctx, params, (err, data) => {
+                accounts.balance(accounts_ctx, balance_params, (err, data) => {
                     if (err) { console.error(err); process.exit(0); }
                     console.info('b2=' + data.value.balance.toString());
 
-                    params.outgoing = null;
-                    params.incoming = '1.0';
-                    accounts.deposit(accounts_ctx, params, (err, data) => {
+                    const deposit_params = Object.freeze({ account_id: balance_params.account_id, incoming: '1.0' });
+                    accounts.deposit(accounts_ctx, deposit_params, (err, data) => {
                         if (err) { console.error(err); process.exit(0); }
                         console.info(data.value.balance.toString());
 
-                        accounts.balance(accounts_ctx, params, (err, data) => {
+                        accounts.balance(accounts_ctx, balance_params, (err, data) => {
                             if (err) { console.error(err); process.exit(0); }
                             console.info('b3=' + data.value.balance.toString());
 
-                            params = {
+                            const transfer_params = Object.freeze({
                                 from: '5a99b022b0a023125aaaae28',
                                 to: '5a9a954f24ca261c2e2fc032',
                                 tranche: '0.5'
-                            };
-                            accounts.transfer(accounts_ctx, params, (err, data) => {
+                            });
+                            accounts.transfer(accounts_ctx, transfer_params, (err, data) => {
                                 console.info(data.from.value.balance.toString());
                                 console.info(data.to.value.balance.toString());
 

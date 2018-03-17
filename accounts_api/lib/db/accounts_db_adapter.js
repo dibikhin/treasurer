@@ -36,8 +36,8 @@ function get_balance(ctx, params, done) {
  * @param {function} done           Callback
  */
 function inc_balance(ctx, params, done) {
-    params.amount = params.incoming;
-    _inc_balance(ctx, params, done);
+    const inc_balance_params = { account_id: params.account_id, amount: params.incoming };
+    _inc_balance(ctx, inc_balance_params, done);
 }
 
 /**
@@ -49,8 +49,8 @@ function inc_balance(ctx, params, done) {
  * @param {function} done           Callback
  */
 function dec_balance(ctx, params, done) {
-    params.amount = '-' + params.outgoing; // minus is for mongo
-    _inc_balance(ctx, params, done);
+    const dec_balance_params = { account_id: params.account_id, amount: '-' + params.outgoing }; //minus is for mongo
+    _inc_balance(ctx, dec_balance_params, done);
 }
 
 function _inc_balance(ctx, params, done) {
