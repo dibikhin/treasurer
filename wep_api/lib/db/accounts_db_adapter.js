@@ -13,7 +13,7 @@ module.exports = {
  * Gets balance
  * @param {object} ctx              Injected params
  * @param {object} ctx.db.accounts  Collection
- * @param {object} ctx.db.driver
+ * @param {object} ctx.driver
  * @param {object} params
  * @param {function} done           Callback
  */
@@ -31,7 +31,7 @@ function get_balance(ctx, params, done) {
  * Increases balance
  * @param {object} ctx              Injected params
  * @param {object} ctx.db.accounts  Collection
- * @param {object} ctx.db.driver
+ * @param {object} ctx.driver
  * @param {object} params
  * @param {function} done           Callback
  */
@@ -44,7 +44,7 @@ function inc_balance(ctx, params, done) {
  * Decreases balance
  * @param {object} ctx              Injected params
  * @param {object} ctx.db.accounts  Collection
- * @param {object} ctx.db.driver
+ * @param {object} ctx.driver
  * @param {object} params
  * @param {function} done           Callback
  */
@@ -55,7 +55,8 @@ function dec_balance(ctx, params, done) {
 
 function _inc_balance(ctx, params, done) {
     ctx.db.accounts
-        .findAndModify({ '_id': new ctx.driver.ObjectID(params.account_id) },
+        .findAndModify(
+            { '_id': new ctx.driver.ObjectID(params.account_id) },
             [],
             {
                 $inc: {

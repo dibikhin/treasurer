@@ -86,9 +86,11 @@ function transfer(ctx, params, done) {
         // if (err) return done(err, null);
         deposit(ctx, params_to, (err, acc_to_after_deposit) => {
             if (err) console.error(err);
-            // deposit(ctx, params_from, (err, acc_from_after_deposit => {
-            //     return done(err, acc_from_after_deposit); ?
-            // }));
+            // {
+            //   deposit(ctx, params_from, (err, acc_from_after_deposit => {
+            //       return done(err, acc_from_after_deposit); ?
+            //   }));
+            // }
 
             return done(err, {
                 from: acc_from_after_withdraw,
