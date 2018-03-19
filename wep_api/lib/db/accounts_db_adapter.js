@@ -19,8 +19,7 @@ module.exports = {
  */
 function get_balance(ctx, params, done) {
     const get_balance_callback = (err, account) => {
-        if (!account)
-            return done('nothing found', null);
+        if (!account) return done('nothing found', null);
         return done(err, account);
     };
     ctx.db.accounts.findOne(new ctx.driver.ObjectID(params.account_id), get_balance_callback);

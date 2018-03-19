@@ -40,6 +40,19 @@ const accounts_db_adapter = benalu
     .addInterception(callback_validator_factory({ helpers }, is_callback_valid)) // TODO config cache 'enabled' option
     // order matters, but how? caching_strategy_factory may break next interceptors
     .addInterception(caching_strategy_factory({ helpers, cache }, { caching_strategy }))
+    .addInterception((invocation) => {
+        function callback_interceptor(target, that, args) {
+            const err = args[0];
+            if (err) {
+                console.log(err);
+            }
+            return target.apply(null, args);
+        }
+
+        const callback = helpers.get_callback(invocation.parameters);
+        const wrapped_callback = wrap_function(callback, interceptor);
+        helpers.set_callback(invocation.parameters, callback_interceptor);
+    })
     .build();
 
 // TODO move to custom_keywords.js
