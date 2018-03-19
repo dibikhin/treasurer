@@ -11,7 +11,8 @@ module.exports = {
 function get_balance(ctx, callback, account_id) {
     const cached_account = ctx.cache.get(account_id);
     if (cached_account) {
-        return () => callback(null, cached_account);
+        const exec_callback = () => callback(null, cached_account);
+        return exec_callback;
     }
 }
 

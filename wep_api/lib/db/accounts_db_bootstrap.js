@@ -10,15 +10,15 @@ module.exports = {
 * @returns  {promise}
 */
 function init(ctx, opts) {
-    return ctx.driver
-        .MongoClient.connect(opts.mongo_url)
-        .then(conn => {
-            const db = conn.db(opts.db_name);
-            const accounts = db.collection(opts.collection_name);
+    const get_collection = connection => {
+        const accounts = connection.db(opts.db_name).collection(opts.collection_name);
+        console.log('Connected successfully to server');
+        return accounts;
+    };
+    return ctx.driver.MongoClient
+        .connect(opts.mongo_url)
+        .then(get_collection)
 
-            console.log('Connected successfully to server');
-            return accounts;
-        })
         // .then(() => {
         //     const account123 = {
         //         balance: ctx.driver.Decimal128.fromString('125.125'),
@@ -30,5 +30,6 @@ function init(ctx, opts) {
         //     };
         //     ctx.accounts.insertOne(account123);
         // })
+
         .catch(err => console.error('error', err));
 }

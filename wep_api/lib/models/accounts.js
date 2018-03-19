@@ -20,12 +20,12 @@ module.exports = {
  * @param {function}    done                Callback
  */
 function balance(ctx, params, done) {
-    ctx.db_adapter.get_balance(ctx, params,
-        (err, account) => {
-            return done(err, {
-                value: account // due to other functions
-            });
+    const balance_callback = (err, account) => {
+        return done(err, {
+            value: account
         });
+    };
+    ctx.db_adapter.get_balance(ctx, params, balance_callback);
 }
 
 /**
@@ -51,16 +51,17 @@ function deposit(ctx, params, done) {
  * @param {function}    done                Callback
  */
 function withdraw(ctx, params, done) {
-    balance(ctx, params, (err, data) => {
+    const withdraw_callback = (err, data) => {
         const payable_params = {
-            outgoing: params.outgoing,
-            account: data.value
+            account: data.value,
+            outgoing: params.outgoing
         };
         if (!ctx.is_payable(payable_params)) {
             return done('insufficient funds', null);
         }
         return ctx.db_adapter.dec_balance(ctx, params, done);
-    });
+    };
+    balance(ctx, params, withdraw_callback);
 }
 
 /**
