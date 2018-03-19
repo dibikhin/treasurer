@@ -43,15 +43,16 @@ const accounts_db_adapter = benalu
     .addInterception((invocation) => {
         function callback_interceptor(target, that, args) {
             const err = args[0];
-            if (err) {
-                console.log(err);
-            }
+            if (err) { console.error(new Error('asdf') + 'op_id= 1234'); } // TODO log op_id. Exit?
             return target.apply(null, args);
         }
 
+        // TODO extract 'replace with wrapped'
         const callback = helpers.get_callback(invocation.parameters);
-        const wrapped_callback = wrap_function(callback, interceptor);
-        helpers.set_callback(invocation.parameters, callback_interceptor);
+        const wrapped_callback = helpers.wrap_function(callback, callback_interceptor);
+        helpers.set_callback(invocation.parameters, wrapped_callback);
+
+        invocation.proceed();
     })
     .build();
 
