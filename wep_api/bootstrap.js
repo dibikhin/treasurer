@@ -6,7 +6,7 @@
 const Ajv = require('ajv');
 const ajv = new Ajv({ allErrors: true });
 
-const benalu = require('benalu/benalu'); // self built, due to old npm
+const benalu = require('./node_modules/benalu/benalu'); // self built, due to old npm
 const mongodb = require('mongodb');
 const Cache = require('ttl');
 
@@ -24,11 +24,13 @@ const is_params_valid = require('infrastructure/advice/params_validator');
 const caching_strategy = require('infrastructure/advice/caching_strategy');
 const error_handling_strategy = require('infrastructure/advice/error_handling_strategy');
 
-const ajv_helpers = require('infrastructure/ajv_helpers');
+const ajv_helpers = require('infrastructure/ajv/helpers');
+const ajv_add_custom_keywords = require('infrastructure/ajv/custom_keywords');
 const helpers = require('infrastructure/helpers');
 
 const accounts_db_adapter_raw = require('db/accounts_db_adapter');
 const accounts_db_bootstrap = require('db/accounts_db_bootstrap');
+const cache_adapter = require('db/cache_adapter');
 
 const accounts_raw = require('models/accounts');
 
@@ -37,24 +39,20 @@ console.info('Starting...');
 // TODO find lazy (on call expiry) cache w/ function caching & callback substitution
 const cache = new Cache({ ttl: 30 * 1000 }); // TODO config
 
+// order matters, but how? caching_strategy_factory may break next interceptors
 const accounts_db_adapter = benalu
     .fromInstance(accounts_db_adapter_raw)
-    .addInterception(callback_validator_factory({ helpers }, is_callback_valid)) // TODO config cache 'enabled' option
-    // order matters, but how? caching_strategy_factory may break next interceptors
-    .addInterception(caching_strategy_factory({ helpers, cache }, { caching_strategy }))
-    .addInterception(error_handling_strategy_factory({ helpers, logger: console }, { error_handling_strategy }))
+    .addInterception(
+        callback_validator_factory(
+            { helpers },
+            { callback_validator_advice: is_callback_valid })) // TODO config cache 'enabled' option    
+    .addInterception(
+        caching_strategy_factory({ helpers, cache, cache_adapter }, { caching_strategy }))
+    .addInterception(
+        error_handling_strategy_factory({ helpers, logger: console }, { error_handling_strategy }))
     .build();
 
-// TODO move to custom_keywords.js
-ajv_helpers.add_keyword(ajv, {
-    keyword: 'mongo_object_id',
-    is_valid: mongodb.ObjectID.isValid
-});
-
-ajv_helpers.add_keyword(ajv, {
-    keyword: 'is_frozen',
-    is_valid: Object.isFrozen
-});
+ajv_add_custom_keywords({ ajv_helpers, ajv, mongodb });
 
 // add_keyword(ajv, { keyword: 'is_frozen_deep', is_valid: Object.isFrozenDeep });
 
@@ -64,8 +62,15 @@ const accounts_params_validators = ajv_helpers.compile_validators({ ajv, schemas
 
 const accounts = benalu
     .fromInstance(accounts_raw)
-    .addInterception(callback_validator_factory({ helpers }, is_callback_valid))
-    .addInterception(params_validator_factory({ params_validators: accounts_params_validators }, is_params_valid))
+    .addInterception(
+        callback_validator_factory({ helpers }, { callback_validator_advice: is_callback_valid }))
+    .addInterception(
+        params_validator_factory({
+            params_validators: accounts_params_validators,
+            params_validator_advice: is_params_valid
+        }))
+    .addInterception(
+        error_handling_strategy_factory({ helpers, logger: console }, { error_handling_strategy }))
     .build();
 
 // addInterception validate business rules ?

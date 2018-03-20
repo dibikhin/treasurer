@@ -1,33 +1,25 @@
-/**
- * @module Caching strategy advice
- */
+module.exports = init_caching_strategy;
 
-module.exports = {
-    get_balance,
-    get_balance_callback,
-    inc_balance
-};
-
-function get_balance(ctx, callback, account_id) {
-    const cached_account = ctx.cache.get(account_id);
-
-    // TODO pull this to caller code
-    if (cached_account) {
-        const exec_callback = () => callback(null, cached_account);
-        return exec_callback;
-    }
-}
-
-function get_balance_callback(target, that, args) {
-    if (args) {
-        const account = args[1];
-        if (account) {
-            this.cache.put(account._id, account); // WARN 'this' is evil      
+function init_caching_strategy() {
+    const inc_balance_handler = (ctx, params) => {
+        const account_id = ctx.helpers.get_account_id(params.invocation.parameters);
+        const deleted_from_cache = ctx.cache_adapter[invocation.memberName](ctx, { account_id });
+        // TODO ctx.logger.debug(deleted_from_cache);
+    };
+    const get_balance_handler = (ctx, params) => {
+        const account_id = ctx.helpers.get_account_id(params.invocation.parameters);
+        const callback = ctx.helpers.get_callback(params.invocation.parameters);
+        const cached_account = ctx.cache_adapter[params.invocation.memberName](ctx, { account_id });
+        if (cached_account) {
+            return callback(null, cached_account);
         }
-    }
-    return target.apply(null, args);
-}
-
-function inc_balance(ctx, account_id) {
-    ctx.cache.del(account_id);
+        const bound_get_balance_callback = ctx.cache_adapter[params.invocation.memberName + '_callback'].bind(ctx); // WARN dirty state
+        const wrapped_get_balance_callback = ctx.helpers.wrap_function(callback, bound_get_balance_callback);
+        ctx.helpers.set_callback(params.invocation.parameters, wrapped_get_balance_callback);
+    };
+    const caching_strategy = {
+        inc_balance: inc_balance_handler,
+        get_balance: get_balance_handler
+    };
+    return caching_strategy;
 }

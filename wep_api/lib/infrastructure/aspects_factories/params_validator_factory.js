@@ -2,13 +2,12 @@ module.exports = create;
 
 /**
  * Factory creating advice
- * @param {function} params_validator_advice Params validator
  */
-function create(ctx, params_validator_advice) {
+function create(params) {
     return function params_validator_aspect(invocation) {
-        const params = invocation.parameters[1];
-        const validate = ctx.params_validators[invocation.memberName]; // WARN closure
-        params_validator_advice(params, validate, invocation.memberName);
+        const invocation_params = invocation.parameters[1];
+        const validate = params.params_validators[invocation.memberName]; // WARN closure
+        params.params_validator_advice(invocation_params, validate, invocation.memberName);
         invocation.proceed();
     };
 }
