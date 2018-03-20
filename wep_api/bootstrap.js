@@ -45,7 +45,8 @@ const accounts_db_adapter = benalu
     .addInterception(
         callback_validator_factory(
             { helpers },
-            { callback_validator_advice: is_callback_valid })) // TODO config cache 'enabled' option    
+            { callback_validator_advice: is_callback_valid }))
+    // TODO config cache 'enabled' option    
     .addInterception(
         caching_strategy_factory({ helpers, cache, cache_adapter }, { caching_strategy }))
     .addInterception(
@@ -53,9 +54,7 @@ const accounts_db_adapter = benalu
     .build();
 
 ajv_add_custom_keywords({ ajv_helpers, ajv, mongodb });
-
 // add_keyword(ajv, { keyword: 'is_frozen_deep', is_valid: Object.isFrozenDeep });
-
 const accounts_params_validators = ajv_helpers.compile_validators({ ajv, schemas: accounts_params_schemas });
 
 // TODO 'accounts' -> 'treasurer'
