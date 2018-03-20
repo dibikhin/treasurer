@@ -17,10 +17,12 @@ const threshold_strategy = require('business_rules/threshold_strategy');
 const caching_strategy_factory = require('infrastructure/aspects_factories/caching_strategy_factory');
 const callback_validator_factory = require('infrastructure/aspects_factories/callback_validator_factory');
 const params_validator_factory = require('infrastructure/aspects_factories/params_validator_factory');
+const error_handling_strategy_factory = require('infrastructure/aspects_factories/error_handling_strategy_factory');
 
 const is_callback_valid = require('infrastructure/advice/callback_validator');
 const is_params_valid = require('infrastructure/advice/params_validator');
 const caching_strategy = require('infrastructure/advice/caching_strategy');
+const error_handling_strategy = require('infrastructure/advice/error_handling_strategy');
 
 const ajv_helpers = require('infrastructure/ajv_helpers');
 const helpers = require('infrastructure/helpers');
@@ -40,20 +42,7 @@ const accounts_db_adapter = benalu
     .addInterception(callback_validator_factory({ helpers }, is_callback_valid)) // TODO config cache 'enabled' option
     // order matters, but how? caching_strategy_factory may break next interceptors
     .addInterception(caching_strategy_factory({ helpers, cache }, { caching_strategy }))
-    .addInterception((invocation) => {
-        function callback_interceptor(target, that, args) {
-            const err = args[0];
-            if (err) { console.error(new Error('asdf') + 'op_id= 1234'); } // TODO log op_id. Exit?
-            return target.apply(null, args);
-        }
-
-        // TODO extract 'replace with wrapped'
-        const callback = helpers.get_callback(invocation.parameters);
-        const wrapped_callback = helpers.wrap_function(callback, callback_interceptor);
-        helpers.set_callback(invocation.parameters, wrapped_callback);
-
-        invocation.proceed();
-    })
+    .addInterception(error_handling_strategy_factory({ helpers, logger: console }, { error_handling_strategy }))
     .build();
 
 // TODO move to custom_keywords.js

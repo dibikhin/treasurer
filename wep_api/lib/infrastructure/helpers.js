@@ -7,6 +7,7 @@
 module.exports = {
     get_callback,
     set_callback,
+    replace_callback,
     get_account_id,
     wrap_function
 };
@@ -30,4 +31,10 @@ function wrap_function(funktion, interceptor) {
     return new Proxy(funktion, {
         apply: interceptor
     });
+}
+
+function replace_callback(params) {
+    const callback = get_callback(params.args);
+    const wrapped_callback = wrap_function(callback, params.callback_interceptor);
+    set_callback(params.args, wrapped_callback);
 }
