@@ -1,7 +1,7 @@
 /**
- * Account's domain model
- * Account stores users' balance and keeps it above threshold
- * @module accounts_model
+ * Treasurer
+ * Stores users' balance, moves it and keeps it above threshold
+ * @module treasurer
  */
 
 module.exports = {
