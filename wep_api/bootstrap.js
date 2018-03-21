@@ -3,6 +3,8 @@
  * @module bootstrap
  */
 
+const uuidv1 = require('uuid/v1');
+
 const Ajv = require('ajv');
 const ajv = new Ajv({ allErrors: true });
 
@@ -100,37 +102,45 @@ accounts_db_bootstrap
 function run_test(accounts_col) {
     accounts_ctx.db = { accounts: accounts_col };
 
+    const op_id = uuidv1();
+
     const balance_params = Object.freeze({
-        account_id: '5a99b022b0a023125aaaae28'
+        account_id: '5a99b022b0a023125aaaae28',
+        op_id
     });
 
     accounts.balance(accounts_ctx, balance_params, (err, data) => {
-        if (err) { console.error(err); process.exit(0); }
+        if (!data) {
+            console.error('Nothing found');
+            console.error(balance_params);
+            process.exit(0);
+        }
         console.info('b1=' + data.value.balance.toString());
 
-        const withdraw_params = Object.freeze({ account_id: balance_params.account_id, outgoing: '0.125' });
+        const withdraw_params = Object.freeze({ account_id: balance_params.account_id, outgoing: '0.125', op_id });
         accounts.withdraw(accounts_ctx, withdraw_params, (err, data) => {
             if (err) { console.error(err); process.exit(0); }
             console.info(data.value.balance.toString());
 
             setTimeout(() => {
                 accounts.balance(accounts_ctx, balance_params, (err, data) => {
-                    if (err) { console.error(err); process.exit(0); }
+                    if (err) { console.error(err); }
                     console.info('b2=' + data.value.balance.toString());
 
-                    const deposit_params = Object.freeze({ account_id: balance_params.account_id, incoming: '1.0' });
+                    const deposit_params = Object.freeze({ account_id: balance_params.account_id, incoming: '1.0', op_id });
                     accounts.deposit(accounts_ctx, deposit_params, (err, data) => {
-                        if (err) { console.error(err); process.exit(0); }
+                        if (err) { console.error(err); }
                         console.info(data.value.balance.toString());
 
                         accounts.balance(accounts_ctx, balance_params, (err, data) => {
-                            if (err) { console.error(err); process.exit(0); }
+                            if (err) { console.error(err); }
                             console.info('b3=' + data.value.balance.toString());
 
                             const transfer_params = Object.freeze({
                                 from: '5a99b022b0a023125aaaae28',
                                 to: '5a9a954f24ca261c2e2fc032',
-                                tranche: '0.5'
+                                tranche: '0.5',
+                                op_id
                             });
                             accounts.transfer(accounts_ctx, transfer_params, (err, data) => {
                                 console.info(data.from.value.balance.toString());

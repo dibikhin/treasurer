@@ -8,8 +8,11 @@ module.exports = error_handling_strategy;
  */
 function error_handling_strategy(target, that, args) {
     const err = args[0];
+    const data = args[1];
     if (err) {
-        this.error(new Error('asdf') + 'op_id= 1234'); // TODO log op_id. Exit? // WARN 'this' is evil
+        this.error('Data: '); // WARN 'this' is evil
+        this.error(data); // WARN 'this' is evil
+        this.error(err); // WARN 'this' is evil
     }
     return target.apply(null, args);
 }

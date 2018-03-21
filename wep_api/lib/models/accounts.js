@@ -17,15 +17,11 @@ module.exports = {
  * @param {object}      ctx.db_adapter
  * @param {object}      params
  * @param {ObjectID}    params.account_id
+ * @param {string}      params.op_id        Correlation Id
  * @param {function}    done                Callback
  */
 function balance(ctx, params, done) {
-    const balance_callback = (err, account) => {
-        return done(err, {
-            value: account
-        });
-    };
-    ctx.db_adapter.get_balance(ctx, params, balance_callback);
+    ctx.db_adapter.get_balance(ctx, params, done);
 }
 
 /**
@@ -51,17 +47,21 @@ function deposit(ctx, params, done) {
  * @param {function}    done                Callback
  */
 function withdraw(ctx, params, done) {
-    const withdraw_callback = (err, data) => {
+    const withdraw_get_balance_callback = (err, data) => {
+        if (err) {
+            return done(err, params);
+        }
         const payable_params = {
             account: data.value,
             outgoing: params.outgoing
         };
         if (!ctx.is_payable(payable_params)) {
-            return done('insufficient funds', null);
+            return done(new Error('insufficient funds'), params);
         }
-        return ctx.db_adapter.dec_balance(ctx, params, done);
+        const withdraw_dec_balance_callback = (err, data) => done(err, data || params);
+        return ctx.db_adapter.dec_balance(ctx, params, withdraw_dec_balance_callback);
     };
-    balance(ctx, params, withdraw_callback);
+    balance(ctx, params, withdraw_get_balance_callback);
 }
 
 /**
@@ -84,16 +84,13 @@ function transfer(ctx, params, done) {
     };
 
     withdraw(ctx, params_from, (err, acc_from_after_withdraw) => {
-        // if (err) return done(err, null);
+        if (err) return done(err, params);
         deposit(ctx, params_to, (err, acc_to_after_deposit) => {
-            if (err) console.error(err);
-            // {
-            //   deposit(ctx, params_from, (err, acc_from_after_deposit => {
-            //       return done(err, acc_from_after_deposit); ?
-            //   }));
-            // }
+            if (err) return done(err, params);
 
-            return done(err, {
+            // TODO try to refund if deposit failed, transaction (begin|commit|rollback)
+
+            return done(null, {
                 from: acc_from_after_withdraw,
                 to: acc_to_after_deposit
             });

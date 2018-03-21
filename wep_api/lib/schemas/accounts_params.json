@@ -4,11 +4,16 @@
         "additionalProperties": false,
         "is_frozen": true,
         "properties": {
+            "op_id": {
+                "type": "string",
+                "minLength": 36
+            },
             "account_id": {
                 "mongo_object_id": true
             }
         },
         "required": [
+            "op_id",
             "account_id"
         ]
     },
@@ -17,6 +22,10 @@
         "additionalProperties": false,
         "is_frozen": true,
         "properties": {
+            "op_id": {
+                "type": "string",
+                "minLength": 36
+            },
             "account_id": {
                 "mongo_object_id": true
             },
@@ -25,6 +34,7 @@
             }
         },
         "required": [
+            "op_id",
             "account_id",
             "incoming"
         ]
@@ -34,6 +44,10 @@
         "additionalProperties": false,
         "is_frozen": true,
         "properties": {
+            "op_id": {
+                "type": "string",
+                "minLength": 36
+            },
             "account_id": {
                 "mongo_object_id": true
             },
@@ -42,6 +56,7 @@
             }
         },
         "required": [
+            "op_id",
             "account_id",
             "outgoing"
         ]
@@ -51,6 +66,10 @@
         "additionalProperties": false,
         "is_frozen": true,
         "properties": {
+            "op_id": {
+                "type": "string",
+                "minLength": 36
+            },
             "from": {
                 "mongo_object_id": true
             },
@@ -62,6 +81,7 @@
             }
         },
         "required": [
+            "op_id",
             "from",
             "to",
             "tranche"
