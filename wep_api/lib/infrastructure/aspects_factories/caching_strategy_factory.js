@@ -1,17 +1,10 @@
 module.exports = create;
 
-function create(ctx, params) { // WARN closures
+function create(ctx) { // WARN closures
     return function caching_strategy_aspect(invocation) {
-        // const noop = () => { };
-        // const caching_strategy = params.caching_strategy();
-        // const handler_params = { invocation };
-
-        // const handler = caching_strategy[invocation.memberName];
-        // (handler ? handler : noop)(ctx, handler_params, () => invocation.proceed());
-
         if (invocation.memberName === 'inc_balance') {
             const account_id = ctx.helpers.get_account_id(invocation.parameters);
-            const deleted_from_cache = ctx.cache_adapter[invocation.memberName](ctx, { account_id });
+            ctx.cache_adapter[invocation.memberName](ctx, { account_id });
             // TODO ctx.logger.debug(deleted_from_cache);
         }
         if (invocation.memberName === 'get_balance') {

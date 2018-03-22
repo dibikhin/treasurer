@@ -3,9 +3,8 @@ module.exports = {
     compile_validators
 };
 
-
 function add_keyword(ajv, params) {
-    const validator = schema => data => params.is_valid(data);
+    const validator = () => data => params.is_valid(data);
     ajv.addKeyword(params.keyword, { compile: validator });
     return ajv;
 }

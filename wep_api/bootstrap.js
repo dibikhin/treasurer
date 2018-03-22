@@ -23,7 +23,6 @@ const error_handling_strategy_factory = require('infrastructure/aspects_factorie
 
 const is_callback_valid = require('infrastructure/advice/callback_validator');
 const is_params_valid = require('infrastructure/advice/params_validator');
-const caching_strategy = require('infrastructure/advice/caching_strategy');
 const error_handling_strategy = require('infrastructure/advice/error_handling_strategy');
 
 const ajv_helpers = require('infrastructure/ajv/helpers');
@@ -49,7 +48,7 @@ const accounts_db_adapter = benalu
             { callback_validator_advice: is_callback_valid }))
     // TODO config cache 'enabled' option    
     .addInterception(
-        caching_strategy_factory({ helpers, cache, cache_adapter }, { caching_strategy }))
+        caching_strategy_factory({ helpers, cache, cache_adapter }))
     .addInterception(
         error_handling_strategy_factory({ helpers, logger: console }, { error_handling_strategy }))
     .build();
@@ -154,3 +153,15 @@ function run_test(accounts_col) {
         });
     });
 }
+
+// .then(() => {
+//     const account123 = {
+//         balance: ctx.driver.Decimal128.fromString('125.125'),
+//         threshold: ctx.driver.Decimal128.fromString('0.125'),
+//         state: 'active',
+//         deleted: false,
+//         created_at: new Date(),
+//         updated_at: new Date()
+//     };
+//     ctx.accounts.insertOne(account123);
+// })

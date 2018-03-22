@@ -10,7 +10,7 @@ function error_handling_strategy(target, that, args) {
     const err = args[0];
     const data = args[1];
     if (err) {
-        this.error('Data: '); // WARN 'this' is evil
+        this.error('Data:'); // WARN 'this' is evil
         this.error(data); // WARN 'this' is evil
         this.error(err); // WARN 'this' is evil
     }

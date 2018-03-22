@@ -84,9 +84,9 @@ function transfer(ctx, params, done) {
     };
 
     withdraw(ctx, params_from, (err, acc_from_after_withdraw) => {
-        if (err) return done(err, params);
+        if (err) { return done(err, params); }
         deposit(ctx, params_to, (err, acc_to_after_deposit) => {
-            if (err) return done(err, params);
+            if (err) { return done(err, params); }
 
             // TODO try to refund if deposit failed, transaction (begin|commit|rollback)
 
