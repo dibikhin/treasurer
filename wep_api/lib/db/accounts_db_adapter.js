@@ -15,13 +15,11 @@ module.exports = {
  * @param {object} ctx.db.accounts  Collection
  * @param {object} ctx.driver
  * @param {object} params
- * @param {function} done           Callback
  */
-function get_balance(ctx, params, done) {
-    // { value: data } is for common result with db.collection.findAndModify()
-    const get_balance_callback = (err, data) => done(err, data ? { value: data } : params);
+async function get_balance(ctx, params) {
     const account_mongo_id = new ctx.driver.ObjectID(params.account_id);
-    ctx.db.accounts.findOne(account_mongo_id, get_balance_callback);
+    const account = await ctx.db.accounts.findOne({ _id: account_mongo_id });
+    return { value: account }; // is for common result with db.collection.findAndModify()
 }
 
 /**
@@ -30,12 +28,13 @@ function get_balance(ctx, params, done) {
  * @param {object} ctx.db.accounts  Collection
  * @param {object} ctx.driver
  * @param {object} params
- * @param {function} done           Callback
  */
-function inc_balance(ctx, params, done) {
-    const inc_balance_params = { account_id: params.account_id, amount: params.incoming };
-    const inc_balance_callback = (err, data) => done(err, data || params);
-    _inc_balance(ctx, inc_balance_params, inc_balance_callback);
+async function inc_balance(ctx, params) {
+    const inc_balance_params = {
+        account_id: params.account_id,
+        amount: params.incoming
+    };
+    return await _inc_balance(ctx, inc_balance_params);
 }
 
 /**
@@ -44,16 +43,17 @@ function inc_balance(ctx, params, done) {
  * @param {object} ctx.db.accounts  Collection
  * @param {object} ctx.driver
  * @param {object} params
- * @param {function} done           Callback
  */
-function dec_balance(ctx, params, done) {
-    const dec_balance_params = { account_id: params.account_id, amount: '-' + params.outgoing }; // 'minus' is for mongo
-    const dec_balance_callback = (err, data) => done(err, data || params);
-    _inc_balance(ctx, dec_balance_params, dec_balance_callback);
+async function dec_balance(ctx, params) {
+    const dec_balance_params = {
+        account_id: params.account_id,
+        amount: '-' + params.outgoing // 'minus' is for mongo
+    };
+    return await _inc_balance(ctx, dec_balance_params);
 }
 
-function _inc_balance(ctx, params, done) {
-    ctx.db.accounts
+async function _inc_balance(ctx, params) {
+    return await ctx.db.accounts
         .findAndModify(
             { '_id': new ctx.driver.ObjectID(params.account_id) },
             [],
@@ -65,6 +65,5 @@ function _inc_balance(ctx, params, done) {
                     updated_at: true
                 }
             },
-            { new: true }, // return updated doc
-            done);
+            { new: true }); // return updated doc
 }

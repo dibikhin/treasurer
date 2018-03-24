@@ -18,10 +18,9 @@ module.exports = {
  * @param {object}      params
  * @param {ObjectID}    params.account_id
  * @param {string}      params.op_id        Correlation Id
- * @param {function}    done                Callback
  */
-function balance(ctx, params, done) {
-    ctx.db_adapter.get_balance(ctx, params, done);
+async function balance(ctx, params) {
+    return await ctx.db_adapter.get_balance(ctx, params);
 }
 
 /**
@@ -31,10 +30,9 @@ function balance(ctx, params, done) {
  * @param {object}      params
  * @param {ObjectID}    params.account_id
  * @param {string}      params.incoming     Decimal amount to store as string
- * @param {function}    done                Callback
  */
-function deposit(ctx, params, done) {
-    return ctx.db_adapter.inc_balance(ctx, params, done);
+async function deposit(ctx, params) {
+    return await ctx.db_adapter.inc_balance(ctx, params);
 }
 
 /**
@@ -44,24 +42,17 @@ function deposit(ctx, params, done) {
  * @param {object}      params
  * @param {ObjectID}    params.account_id
  * @param {string}      params.outgoing     Decimal amount to spend as string
- * @param {function}    done                Callback
  */
-function withdraw(ctx, params, done) {
-    const withdraw_get_balance_callback = (err, data) => {
-        if (err) {
-            return done(err, params);
-        }
-        const payable_params = {
-            account: data.value,
-            outgoing: params.outgoing
-        };
-        if (!ctx.is_payable(payable_params)) {
-            return done(new Error('insufficient funds'), params);
-        }
-        const withdraw_dec_balance_callback = (err, data) => done(err, data || params);
-        return ctx.db_adapter.dec_balance(ctx, params, withdraw_dec_balance_callback);
+async function withdraw(ctx, params) {
+    const data = await balance(ctx, params);
+    const payable_params = {
+        account: data.value,
+        outgoing: params.outgoing
     };
-    balance(ctx, params, withdraw_get_balance_callback);
+    if (!ctx.is_payable(payable_params)) {
+        throw new Error('insufficient funds');
+    }
+    return await ctx.db_adapter.dec_balance(ctx, params);
 }
 
 /**
@@ -71,9 +62,8 @@ function withdraw(ctx, params, done) {
  * @param {ObjectID}    params.from     Sender's account id
  * @param {ObjectID}    params.to       Reciever's account id
  * @param {string}      params.tranche  Decimal amount to transfer as string
- * @param {function}    done            Callback
  */
-function transfer(ctx, params, done) {
+async function transfer(ctx, params) {
     const params_from = {
         account_id: params.from,
         outgoing: params.tranche
@@ -83,17 +73,13 @@ function transfer(ctx, params, done) {
         incoming: params.tranche
     };
 
-    withdraw(ctx, params_from, (err, acc_from_after_withdraw) => {
-        if (err) { return done(err, params); }
-        deposit(ctx, params_to, (err, acc_to_after_deposit) => {
-            if (err) { return done(err, params); }
+    const acc_from_after_withdraw = await withdraw(ctx, params_from);
+    const acc_to_after_deposit = await deposit(ctx, params_to);
 
-            // TODO try to refund if deposit failed, transaction (begin|commit|rollback)
+    // TODO handle withdraw or deposit fail
 
-            return done(null, {
-                from: acc_from_after_withdraw,
-                to: acc_to_after_deposit
-            });
-        });
-    });
+    return {
+        from: acc_from_after_withdraw,
+        to: acc_to_after_deposit
+    };
 }
