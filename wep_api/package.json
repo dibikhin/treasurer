@@ -1,0 +1,19 @@
+{
+  "name": "treasurer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bootstrap.js",
+  "scripts": {
+    "start": "eslint bootstrap.js && eslint 'lib/**' && NODE_PATH=./lib node --use_strict bootstrap.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ajv": "^6.2.1",
+    "eslint": "^4.19.1",
+    "mongodb": "^3.0.2",
+    "ttl": "^1.3.1",
+    "uuid": "^3.2.1"
+  }
+}
