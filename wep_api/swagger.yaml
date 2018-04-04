@@ -1,0 +1,414 @@
+swagger: "2.0"
+info:
+  description: "User balance storage and management. Read more at [GitHub](https://github.com/dibikhin/treasurer/blob/master/README.md)."
+  version: "0.1.0"
+  title: "Tresurer"
+  termsOfService: "https://github.com/dibikhin/treasurer/terms/TODO"
+  contact:
+    email: "dibikhin@gmail.com"
+  license:
+    name: "Apache 2.0 TODO"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html.TODO"
+host: "TODO"
+basePath: "/v0"
+tags:
+- name: "treasurer"
+  description: "Operating on account balance"
+- name: "account"
+  description: "Accounts CRUD"
+schemes:
+- "http"
+externalDocs:
+  description: "Find out more at Github"
+  url: "https://github.com/dibikhin/treasurer"
+paths:
+  /treasurer/withdraw:
+    post:
+      tags:
+      - "treasurer"
+      summary: "withdraw funds"
+      description: "Returns the account brief after withdrawal"
+      operationId: "withdraw"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Object with parameters of withdrawal"
+        required: true
+        schema:
+          $ref: "#/definitions/WithdrawRequest"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/TreasurerResponse"
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+  /treasurer/deposit:
+    post:
+      tags:
+      - "treasurer"
+      summary: "deposit funds"
+      description: "Returns the account brief after deposit"
+      operationId: "deposit"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Object with parameters of depositing"
+        required: true
+        schema:
+          $ref: "#/definitions/DepositRequest"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/TreasurerResponse"
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+  /treasurer/balance/{account_id}:
+    get:
+      tags:
+      - "treasurer"
+      summary: "get account balance"
+      description: "Returns the account's balance"
+      operationId: "balance"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "account_id"
+        in: "path"
+        description: "ID of account to return"
+        required: true
+        type: "string"
+        minLength: 24
+        maxLength: 24
+        # format: "mongo_id"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/TreasurerResponse"
+        400:
+          description: "Invalid ID supplied"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        404:
+          description: "Account not found"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+  /accounts:
+    post:
+      tags:
+      - "account"
+      summary: "Add a new account"
+      description: "Returns the new account"
+      operationId: "add_account"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Account object that needs to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/CreateAccountRequest"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/AccountResponse"
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+    put:
+      tags:
+      - "account"
+      summary: "Update an existing account"
+      description: "Returns the updated account"
+      operationId: "update_account"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Account object that needs to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateAccountRequest"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/AccountResponse"
+        400:
+          description: "Invalid ID supplied"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        404:
+          description: "Account not found"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        405:
+          description: "Validation exception"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+  /accounts/{account_id}:
+    get:
+      tags:
+      - "account"
+      summary: "Find account by ID"
+      description: "Returns a single account"
+      operationId: "get_account_by_id"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "account_id"
+        in: "path"
+        description: "ID of account to return"
+        required: true
+        type: "string"
+        minLength: 24
+        maxLength: 24
+        # format: "mongo_id"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/AccountResponse"
+        400:
+          description: "Invalid ID supplied"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        404:
+          description: "Account not found"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+    post:
+      tags:
+      - "account"
+      summary: "Updates an account with form data"
+      description: "Returns the updated account"
+      operationId: "update_account_with_form"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "account_id"
+        in: "path"
+        description: "ID of account that needs to be updated"
+        required: true
+        type: "string"
+        minLength: 24
+        maxLength: 24
+        # format: "mongo_id"
+      - name: "status"
+        in: "formData"
+        description: "Updated status of the account"
+        required: false
+        type: "string"
+        enum:
+        - "active"
+        - "suspended"
+      - name: "threshold"
+        in: "formData"
+        description: "Updated threshold of the account"
+        required: false
+        type: "number"
+        # format: "decimal"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/AccountResponse"
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+    delete:
+      tags:
+      - "account"
+      summary: "Deletes an account"
+      operationId: "delete_account"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "account_id"
+        in: "path"
+        description: "Account ID to delete"
+        required: true
+        type: "string"
+        minLength: 24
+        maxLength: 24
+        # format: "mongo_id"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid ID supplied"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        404:
+          description: "Account not found"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+definitions:
+  AccountResponse:
+    type: "object"
+    additionalProperties: false
+    properties:
+      account:
+        $ref: "#/definitions/Account"
+      op_id:
+        $ref: "#/definitions/op_id"
+  Account:
+    type: "object"
+    required:
+    - "id"
+    - "balance"
+    - "threshold"
+    - "status"
+    - "deleted"
+    - "created_at_utc"
+    - "updated_at_utc"
+    additionalProperties: false
+    properties:
+      id:
+        $ref: "#/definitions/id"
+      balance:
+        $ref: "#/definitions/amount"
+      threshold:
+        $ref: "#/definitions/amount"
+      status:
+        $ref: "#/definitions/status"
+      deleted:
+        type: "boolean"
+        description: "read only, 'delete' sets this implicitly"
+      created_at_utc:
+        $ref: "#/definitions/date_time"
+      updated_at_utc:
+        $ref: "#/definitions/date_time"
+  CreateAccountRequest:
+    type: "object"
+    additionalProperties: false
+    required:
+    - "balance"
+    - "threshold"
+    properties:
+      balance:
+        $ref: "#/definitions/amount"
+      threshold:
+        $ref: "#/definitions/amount"
+  UpdateAccountRequest:
+    type: "object"
+    additionalProperties: false
+    required:
+    - "id"
+    properties:
+      id:
+        $ref: "#/definitions/id"
+      status:
+        $ref: "#/definitions/status"
+      threshold:
+        $ref: "#/definitions/amount"
+  ApiResponse:
+    type: "object"
+    required:
+    - "code"
+    - "title"
+    - "detail"
+    - "op_id"
+    additionalProperties: false
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      title:
+        type: "string"
+      detail:
+        type: "string"
+      op_id:
+        $ref: "#/definitions/op_id"
+  WithdrawRequest:
+    type: "object"
+    required:
+    - "id"
+    - "outgoing"
+    additionalProperties: false
+    properties:
+      id:
+        $ref: "#/definitions/id"
+      outgoing:
+        $ref: "#/definitions/amount"
+  DepositRequest:
+    type: "object"
+    required:
+    - "id"
+    - "incoming"
+    additionalProperties: false
+    properties:
+      id:
+        $ref: "#/definitions/id"
+      incoming:
+        $ref: "#/definitions/amount"
+  AccountBrief:
+    type: "object"
+    required:
+    - "id"
+    - "balance"
+    additionalProperties: false
+    properties:
+      id:
+        $ref: "#/definitions/id"
+      balance:
+        $ref: "#/definitions/amount"
+  TreasurerResponse:
+    type: "object"
+    required:
+    - "account_brief"
+    - "op_id"
+    additionalProperties: false
+    properties:
+      account_brief:
+        $ref: "#/definitions/AccountBrief"
+      op_id:
+        $ref: "#/definitions/op_id"
+  id:
+    type: "string"
+    minLength: 24
+    maxLength: 24
+    # format: "mongo_id"
+  op_id:
+    type: "string"
+    format: "uuid"
+    description: "correlation Id"
+  status:
+    type: "string"
+    description: "account status"
+    enum:
+    - "active"
+    - "suspended"
+  amount:
+    type: "number"
+    # format: "decimal"
+    example: "-123.456"
+  date_time:
+    type: "string"
+    format: "date-time"
+    description: "read only"
