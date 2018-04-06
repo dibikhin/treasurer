@@ -1,3 +1,4 @@
+---
 swagger: "2.0"
 info:
   description: "User balance storage and management. Read more at [GitHub](https://github.com/dibikhin/treasurer/blob/master/README.md)."
@@ -18,95 +19,7 @@ tags:
   description: "Accounts CRUD"
 schemes:
 - "http"
-externalDocs:
-  description: "Find out more at Github"
-  url: "https://github.com/dibikhin/treasurer"
 paths:
-  /treasurer/withdraw:
-    post:
-      tags:
-      - "treasurer"
-      summary: "withdraw funds"
-      description: "Returns the account brief after withdrawal"
-      operationId: "withdraw"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Object with parameters of withdrawal"
-        required: true
-        schema:
-          $ref: "#/definitions/WithdrawRequest"
-      responses:
-        200:
-          description: "Successful operation"
-          schema:
-            $ref: "#/definitions/TreasurerResponse"
-        405:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-  /treasurer/deposit:
-    post:
-      tags:
-      - "treasurer"
-      summary: "deposit funds"
-      description: "Returns the account brief after deposit"
-      operationId: "deposit"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Object with parameters of depositing"
-        required: true
-        schema:
-          $ref: "#/definitions/DepositRequest"
-      responses:
-        200:
-          description: "Successful operation"
-          schema:
-            $ref: "#/definitions/TreasurerResponse"
-        405:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-  /treasurer/balance/{account_id}:
-    get:
-      tags:
-      - "treasurer"
-      summary: "get account balance"
-      description: "Returns the account's balance"
-      operationId: "balance"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "account_id"
-        in: "path"
-        description: "ID of account to return"
-        required: true
-        type: "string"
-        minLength: 24
-        maxLength: 24
-        # format: "mongo_id"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/TreasurerResponse"
-        400:
-          description: "Invalid ID supplied"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-        404:
-          description: "Account not found"
-          schema:
-            $ref: "#/definitions/ApiResponse"
   /accounts:
     post:
       tags:
@@ -134,6 +47,7 @@ paths:
           description: "Invalid input"
           schema:
             $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "Account"
     put:
       tags:
       - "account"
@@ -168,6 +82,7 @@ paths:
           description: "Validation exception"
           schema:
             $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "Account"
   /accounts/{account_id}:
     get:
       tags:
@@ -183,9 +98,8 @@ paths:
         description: "ID of account to return"
         required: true
         type: "string"
-        minLength: 24
         maxLength: 24
-        # format: "mongo_id"
+        minLength: 24
       responses:
         200:
           description: "successful operation"
@@ -199,6 +113,7 @@ paths:
           description: "Account not found"
           schema:
             $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "Account"
     post:
       tags:
       - "account"
@@ -215,9 +130,8 @@ paths:
         description: "ID of account that needs to be updated"
         required: true
         type: "string"
-        minLength: 24
         maxLength: 24
-        # format: "mongo_id"
+        minLength: 24
       - name: "status"
         in: "formData"
         description: "Updated status of the account"
@@ -231,7 +145,6 @@ paths:
         description: "Updated threshold of the account"
         required: false
         type: "number"
-        # format: "decimal"
       responses:
         200:
           description: "Successful operation"
@@ -241,6 +154,7 @@ paths:
           description: "Invalid input"
           schema:
             $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "Account"
     delete:
       tags:
       - "account"
@@ -254,9 +168,8 @@ paths:
         description: "Account ID to delete"
         required: true
         type: "string"
-        minLength: 24
         maxLength: 24
-        # format: "mongo_id"
+        minLength: 24
       responses:
         200:
           description: "Successful operation"
@@ -268,10 +181,97 @@ paths:
           description: "Account not found"
           schema:
             $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "Account"
+  /treasurer/balance/{account_id}:
+    get:
+      tags:
+      - "treasurer"
+      summary: "get account balance"
+      description: "Returns the account's balance"
+      operationId: "balance"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "account_id"
+        in: "path"
+        description: "ID of account to return"
+        required: true
+        type: "string"
+        maxLength: 24
+        minLength: 24
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/TreasurerResponse"
+        400:
+          description: "Invalid ID supplied"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        404:
+          description: "Account not found"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "Treasurer"
+  /treasurer/deposit:
+    post:
+      tags:
+      - "treasurer"
+      summary: "deposit funds"
+      description: "Returns the account brief after deposit"
+      operationId: "deposit"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Object with parameters of depositing"
+        required: true
+        schema:
+          $ref: "#/definitions/DepositRequest"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/TreasurerResponse"
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "Treasurer"
+  /treasurer/withdraw:
+    post:
+      tags:
+      - "treasurer"
+      summary: "withdraw funds"
+      description: "Returns the account brief after withdrawal"
+      operationId: "withdraw"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Object with parameters of withdrawal"
+        required: true
+        schema:
+          $ref: "#/definitions/WithdrawRequest"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/TreasurerResponse"
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "Treasurer"
 definitions:
   AccountResponse:
     type: "object"
-    additionalProperties: false
     properties:
       account:
         $ref: "#/definitions/Account"
@@ -280,14 +280,13 @@ definitions:
   Account:
     type: "object"
     required:
-    - "id"
     - "balance"
-    - "threshold"
-    - "status"
-    - "deleted"
     - "created_at_utc"
+    - "deleted"
+    - "id"
+    - "status"
+    - "threshold"
     - "updated_at_utc"
-    additionalProperties: false
     properties:
       id:
         $ref: "#/definitions/id"
@@ -306,7 +305,6 @@ definitions:
         $ref: "#/definitions/date_time"
   CreateAccountRequest:
     type: "object"
-    additionalProperties: false
     required:
     - "balance"
     - "threshold"
@@ -317,7 +315,6 @@ definitions:
         $ref: "#/definitions/amount"
   UpdateAccountRequest:
     type: "object"
-    additionalProperties: false
     required:
     - "id"
     properties:
@@ -331,10 +328,9 @@ definitions:
     type: "object"
     required:
     - "code"
-    - "title"
     - "detail"
     - "op_id"
-    additionalProperties: false
+    - "title"
     properties:
       code:
         type: "integer"
@@ -350,7 +346,6 @@ definitions:
     required:
     - "id"
     - "outgoing"
-    additionalProperties: false
     properties:
       id:
         $ref: "#/definitions/id"
@@ -361,7 +356,6 @@ definitions:
     required:
     - "id"
     - "incoming"
-    additionalProperties: false
     properties:
       id:
         $ref: "#/definitions/id"
@@ -370,9 +364,8 @@ definitions:
   AccountBrief:
     type: "object"
     required:
-    - "id"
     - "balance"
-    additionalProperties: false
+    - "id"
     properties:
       id:
         $ref: "#/definitions/id"
@@ -383,7 +376,6 @@ definitions:
     required:
     - "account_brief"
     - "op_id"
-    additionalProperties: false
     properties:
       account_brief:
         $ref: "#/definitions/AccountBrief"
@@ -391,9 +383,6 @@ definitions:
         $ref: "#/definitions/op_id"
   id:
     type: "string"
-    minLength: 24
-    maxLength: 24
-    # format: "mongo_id"
   op_id:
     type: "string"
     format: "uuid"
@@ -406,10 +395,11 @@ definitions:
     - "suspended"
   amount:
     type: "number"
-    # format: "decimal"
-    example: "-123.456"
+    example: "\"-123.456\""
   date_time:
     type: "string"
     format: "date-time"
     description: "read only"
-
+externalDocs:
+  description: "Find out more at Github"
+  url: "https://github.com/dibikhin/treasurer"
