@@ -44,9 +44,9 @@ async function deposit(ctx, params) {
  * @param {string}      params.outgoing     Decimal amount to spend as string
  */
 async function withdraw(ctx, params) {
-    const data = await balance(ctx, params);
+    const account = await balance(ctx, params);
     const payable_params = {
-        account: data.value,
+        account,
         outgoing: params.outgoing
     };
     if (!ctx.is_payable(payable_params)) {
@@ -75,8 +75,6 @@ async function transfer(ctx, params) {
 
     const acc_from_after_withdraw = await withdraw(ctx, params_from);
     const acc_to_after_deposit = await deposit(ctx, params_to);
-
-    // TODO handle withdraw or deposit fail
 
     return {
         from: acc_from_after_withdraw,

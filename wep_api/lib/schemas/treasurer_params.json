@@ -30,7 +30,7 @@
                 "mongo_object_id": true
             },
             "incoming": {
-                "type": "string"
+                "type": "number"
             }
         },
         "required": [
@@ -52,7 +52,7 @@
                 "mongo_object_id": true
             },
             "outgoing": {
-                "type": "string"
+                "type": "number"
             }
         },
         "required": [
@@ -77,7 +77,7 @@
                 "mongo_object_id": true
             },
             "tranche": {
-                "type": "string"
+                "type": "number"
             }
         },
         "required": [

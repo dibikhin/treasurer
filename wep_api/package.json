@@ -7,17 +7,19 @@
     "start": "eslint bootstrap.js && eslint app.js && eslint 'lib/**' && NODE_PATH=./lib NODE_ENV=development node --use_strict bootstrap.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Roman Dibikhin",
   "license": "ISC",
   "private": true,
   "dependencies": {
     "ajv": "^6.2.1",
-    "eslint": "^4.19.1",
-    "mongodb": "^3.0.2",
-    "ttl": "^1.3.1",
-    "uuid": "^3.2.1",
     "connect": "^3.2.0",
+    "eslint": "^4.19.1",
     "js-yaml": "^3.3.0",
-    "swagger-tools": "0.10.3"
+    "mongodb": "^3.0.2",
+    "nocache": "^2.0.0",
+    "res-json": "^1.0.1",
+    "swagger-tools": "0.10.3",
+    "ttl": "^1.3.1",
+    "uuid": "^3.2.1"
   }
 }

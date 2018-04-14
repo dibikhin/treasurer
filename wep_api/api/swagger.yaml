@@ -95,7 +95,6 @@ paths:
       parameters:
       - name: "account_id"
         in: "path"
-        description: "ID of account to return"
         required: true
         type: "string"
         maxLength: 24
@@ -127,7 +126,6 @@ paths:
       parameters:
       - name: "account_id"
         in: "path"
-        description: "ID of account that needs to be updated"
         required: true
         type: "string"
         maxLength: 24
@@ -165,7 +163,6 @@ paths:
       parameters:
       - name: "account_id"
         in: "path"
-        description: "Account ID to delete"
         required: true
         type: "string"
         maxLength: 24
@@ -194,31 +191,54 @@ paths:
       parameters:
       - name: "account_id"
         in: "path"
-        description: "ID of account to return"
         required: true
         type: "string"
         maxLength: 24
         minLength: 24
       responses:
         200:
-          description: "successful operation"
+          description: "Successful operation"
           schema:
             $ref: "#/definitions/TreasurerResponse"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
         400:
-          description: "Invalid ID supplied"
+          description: "Invalid parameters"
           schema:
             $ref: "#/definitions/ApiResponse"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
         404:
-          description: "Account not found"
+          description: "Account Not Found"
           schema:
             $ref: "#/definitions/ApiResponse"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
       x-swagger-router-controller: "Treasurer"
   /treasurer/deposit:
     post:
       tags:
       - "treasurer"
       summary: "deposit funds"
-      description: "Returns the account brief after deposit"
+      description: "Returns the account brief after depositing"
       operationId: "deposit"
       consumes:
       - "application/json"
@@ -230,16 +250,44 @@ paths:
         description: "Object with parameters of depositing"
         required: true
         schema:
-          $ref: "#/definitions/DepositRequest"
+          $ref: "#/definitions/DepositingRequest"
       responses:
         200:
           description: "Successful operation"
           schema:
             $ref: "#/definitions/TreasurerResponse"
-        405:
-          description: "Invalid input"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
+        400:
+          description: "Invalid parameters"
           schema:
             $ref: "#/definitions/ApiResponse"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
+        404:
+          description: "Account Not Found"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
       x-swagger-router-controller: "Treasurer"
   /treasurer/withdraw:
     post:
@@ -258,16 +306,44 @@ paths:
         description: "Object with parameters of withdrawal"
         required: true
         schema:
-          $ref: "#/definitions/WithdrawRequest"
+          $ref: "#/definitions/WithdrawalRequest"
       responses:
         200:
           description: "Successful operation"
           schema:
             $ref: "#/definitions/TreasurerResponse"
-        405:
-          description: "Invalid input"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
+        400:
+          description: "Invalid parameters"
           schema:
             $ref: "#/definitions/ApiResponse"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
+        404:
+          description: "Account Not Found"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
       x-swagger-router-controller: "Treasurer"
 definitions:
   AccountResponse:
@@ -275,8 +351,6 @@ definitions:
     properties:
       account:
         $ref: "#/definitions/Account"
-      op_id:
-        $ref: "#/definitions/op_id"
   Account:
     type: "object"
     required:
@@ -289,7 +363,7 @@ definitions:
     - "updated_at_utc"
     properties:
       id:
-        $ref: "#/definitions/id"
+        $ref: "#/definitions/account_id"
       balance:
         $ref: "#/definitions/amount"
       threshold:
@@ -316,10 +390,10 @@ definitions:
   UpdateAccountRequest:
     type: "object"
     required:
-    - "id"
+    - "account_id"
     properties:
-      id:
-        $ref: "#/definitions/id"
+      account_id:
+        $ref: "#/definitions/account_id"
       status:
         $ref: "#/definitions/status"
       threshold:
@@ -329,7 +403,6 @@ definitions:
     required:
     - "code"
     - "detail"
-    - "op_id"
     - "title"
     properties:
       code:
@@ -339,26 +412,24 @@ definitions:
         type: "string"
       detail:
         type: "string"
-      op_id:
-        $ref: "#/definitions/op_id"
-  WithdrawRequest:
+  WithdrawalRequest:
     type: "object"
     required:
-    - "id"
+    - "account_id"
     - "outgoing"
     properties:
-      id:
-        $ref: "#/definitions/id"
+      account_id:
+        $ref: "#/definitions/account_id"
       outgoing:
         $ref: "#/definitions/amount"
-  DepositRequest:
+  DepositingRequest:
     type: "object"
     required:
-    - "id"
+    - "account_id"
     - "incoming"
     properties:
-      id:
-        $ref: "#/definitions/id"
+      account_id:
+        $ref: "#/definitions/account_id"
       incoming:
         $ref: "#/definitions/amount"
   AccountBrief:
@@ -368,25 +439,18 @@ definitions:
     - "id"
     properties:
       id:
-        $ref: "#/definitions/id"
+        $ref: "#/definitions/account_id"
       balance:
         $ref: "#/definitions/amount"
   TreasurerResponse:
     type: "object"
     required:
     - "account_brief"
-    - "op_id"
     properties:
       account_brief:
         $ref: "#/definitions/AccountBrief"
-      op_id:
-        $ref: "#/definitions/op_id"
-  id:
+  account_id:
     type: "string"
-  op_id:
-    type: "string"
-    format: "uuid"
-    description: "correlation Id"
   status:
     type: "string"
     description: "account status"
@@ -395,11 +459,56 @@ definitions:
     - "suspended"
   amount:
     type: "number"
-    example: "\"-123.456\""
+    example: "1.25"
   date_time:
     type: "string"
     format: "date-time"
     description: "read only"
+parameters:
+  account_id:
+    name: "account_id"
+    in: "path"
+    required: true
+    type: "string"
+    maxLength: 24
+    minLength: 24
+responses:
+  ErrorBadRequest:
+    description: "Invalid parameters"
+    schema:
+      $ref: "#/definitions/ApiResponse"
+    headers:
+      X-Request-ID:
+        type: "string"
+        format: "uuid"
+        description: "correlation Id"
+  ErrorNotFound:
+    description: "Account Not Found"
+    schema:
+      $ref: "#/definitions/ApiResponse"
+    headers:
+      X-Request-ID:
+        type: "string"
+        format: "uuid"
+        description: "correlation Id"
+  ErrorServerError:
+    description: "Internal Server Error"
+    schema:
+      $ref: "#/definitions/ApiResponse"
+    headers:
+      X-Request-ID:
+        type: "string"
+        format: "uuid"
+        description: "correlation Id"
+  TreasurerOK:
+    description: "Successful operation"
+    schema:
+      $ref: "#/definitions/TreasurerResponse"
+    headers:
+      X-Request-ID:
+        type: "string"
+        format: "uuid"
+        description: "correlation Id"
 externalDocs:
   description: "Find out more at Github"
   url: "https://github.com/dibikhin/treasurer"
