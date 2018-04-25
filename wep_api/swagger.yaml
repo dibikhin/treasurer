@@ -39,22 +39,22 @@ paths:
         description: "Object with parameters of withdrawal"
         required: true
         schema:
-          $ref: "#/definitions/WithdrawRequest"
+          $ref: "#/definitions/WithdrawalRequest"
       responses:
         200:
-          description: "Successful operation"
-          schema:
-            $ref: "#/definitions/TreasurerResponse"
-        405:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ApiResponse"
+          $ref: "#/responses/TreasurerOK"
+        400:
+          $ref: "#/responses/ErrorBadRequest"
+        404:
+          $ref: "#/responses/ErrorNotFound"
+        500:
+          $ref: "#/responses/ErrorServerError"
   /treasurer/deposit:
     post:
       tags:
       - "treasurer"
       summary: "deposit funds"
-      description: "Returns the account brief after deposit"
+      description: "Returns the account brief after depositing"
       operationId: "deposit"
       consumes:
       - "application/json"
@@ -66,16 +66,16 @@ paths:
         description: "Object with parameters of depositing"
         required: true
         schema:
-          $ref: "#/definitions/DepositRequest"
+          $ref: "#/definitions/DepositingRequest"
       responses:
         200:
-          description: "Successful operation"
-          schema:
-            $ref: "#/definitions/TreasurerResponse"
-        405:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ApiResponse"
+          $ref: "#/responses/TreasurerOK"
+        400:
+          $ref: "#/responses/ErrorBadRequest"
+        404:
+          $ref: "#/responses/ErrorNotFound"
+        500:
+          $ref: "#/responses/ErrorServerError"
   /treasurer/balance/{account_id}:
     get:
       tags:
@@ -86,27 +86,16 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "account_id"
-        in: "path"
-        description: "ID of account to return"
-        required: true
-        type: "string"
-        minLength: 24
-        maxLength: 24
-        # format: "mongo_id"
+      - $ref: "#/parameters/account_id"
       responses:
         200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/TreasurerResponse"
+          $ref: "#/responses/TreasurerOK"
         400:
-          description: "Invalid ID supplied"
-          schema:
-            $ref: "#/definitions/ApiResponse"
+          $ref: "#/responses/ErrorBadRequest"
         404:
-          description: "Account not found"
-          schema:
-            $ref: "#/definitions/ApiResponse"
+          $ref: "#/responses/ErrorNotFound"
+        500:
+          $ref: "#/responses/ErrorServerError"
   /accounts:
     post:
       tags:
@@ -178,14 +167,7 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "account_id"
-        in: "path"
-        description: "ID of account to return"
-        required: true
-        type: "string"
-        minLength: 24
-        maxLength: 24
-        # format: "mongo_id"
+      - $ref: "#/parameters/account_id"
       responses:
         200:
           description: "successful operation"
@@ -210,14 +192,7 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "account_id"
-        in: "path"
-        description: "ID of account that needs to be updated"
-        required: true
-        type: "string"
-        minLength: 24
-        maxLength: 24
-        # format: "mongo_id"
+      - $ref: "#/parameters/account_id"
       - name: "status"
         in: "formData"
         description: "Updated status of the account"
@@ -249,14 +224,7 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "account_id"
-        in: "path"
-        description: "Account ID to delete"
-        required: true
-        type: "string"
-        minLength: 24
-        maxLength: 24
-        # format: "mongo_id"
+      - $ref: "#/parameters/account_id"
       responses:
         200:
           description: "Successful operation"
@@ -275,8 +243,6 @@ definitions:
     properties:
       account:
         $ref: "#/definitions/Account"
-      op_id:
-        $ref: "#/definitions/op_id"
   Account:
     type: "object"
     required:
@@ -290,7 +256,7 @@ definitions:
     additionalProperties: false
     properties:
       id:
-        $ref: "#/definitions/id"
+        $ref: "#/definitions/account_id"
       balance:
         $ref: "#/definitions/amount"
       threshold:
@@ -319,10 +285,10 @@ definitions:
     type: "object"
     additionalProperties: false
     required:
-    - "id"
+    - "account_id"
     properties:
-      id:
-        $ref: "#/definitions/id"
+      account_id:
+        $ref: "#/definitions/account_id"
       status:
         $ref: "#/definitions/status"
       threshold:
@@ -333,7 +299,6 @@ definitions:
     - "code"
     - "title"
     - "detail"
-    - "op_id"
     additionalProperties: false
     properties:
       code:
@@ -343,28 +308,26 @@ definitions:
         type: "string"
       detail:
         type: "string"
-      op_id:
-        $ref: "#/definitions/op_id"
-  WithdrawRequest:
+  WithdrawalRequest:
     type: "object"
     required:
-    - "id"
+    - "account_id"
     - "outgoing"
     additionalProperties: false
     properties:
-      id:
-        $ref: "#/definitions/id"
+      account_id:
+        $ref: "#/definitions/account_id"
       outgoing:
         $ref: "#/definitions/amount"
-  DepositRequest:
+  DepositingRequest:
     type: "object"
     required:
-    - "id"
+    - "account_id"
     - "incoming"
     additionalProperties: false
     properties:
-      id:
-        $ref: "#/definitions/id"
+      account_id:
+        $ref: "#/definitions/account_id"
       incoming:
         $ref: "#/definitions/amount"
   AccountBrief:
@@ -375,29 +338,22 @@ definitions:
     additionalProperties: false
     properties:
       id:
-        $ref: "#/definitions/id"
+        $ref: "#/definitions/account_id"
       balance:
         $ref: "#/definitions/amount"
   TreasurerResponse:
     type: "object"
     required:
     - "account_brief"
-    - "op_id"
     additionalProperties: false
     properties:
       account_brief:
         $ref: "#/definitions/AccountBrief"
-      op_id:
-        $ref: "#/definitions/op_id"
-  id:
+  account_id:
     type: "string"
     minLength: 24
     maxLength: 24
     # format: "mongo_id"
-  op_id:
-    type: "string"
-    format: "uuid"
-    description: "correlation Id"
   status:
     type: "string"
     description: "account status"
@@ -407,9 +363,59 @@ definitions:
   amount:
     type: "number"
     # format: "decimal"
-    example: "-123.456"
+    minimum: 0
+    example: 1.25
   date_time:
     type: "string"
     format: "date-time"
     description: "read only"
+parameters:
+  account_id:
+    name: "account_id"
+    in: "path"
+    required: true
+    type: "string"
+    minLength: 24
+    maxLength: 24
+    # format: "mongo_id"
+responses:
+  TreasurerOK:
+    description: "Successful operation"
+    schema:
+      $ref: "#/definitions/TreasurerResponse"
+    headers:
+      X-Request-ID:
+        type: "string"
+        format: "uuid"
+        description: "correlation Id"
+  ErrorBadRequest:
+    description: "Invalid parameters"
+    schema:
+      $ref: "#/definitions/ApiResponse"
+    headers:
+      X-Request-ID:
+        type: "string"
+        format: "uuid"
+        description: "correlation Id"
+  ErrorNotFound:
+    description: "Account Not Found"
+    schema:
+      $ref: "#/definitions/ApiResponse"
+    headers:
+      X-Request-ID:
+        type: "string"
+        format: "uuid"
+        description: "correlation Id"
+  ErrorServerError:
+    description: "Internal Server Error"
+    schema:
+      $ref: "#/definitions/ApiResponse"
+    headers:
+      X-Request-ID:
+        type: "string"
+        format: "uuid"
+        description: "correlation Id"
 
+# TODO 402 ?
+# TODO 503 ?
+# TODO threshold_amount negative|0|positive

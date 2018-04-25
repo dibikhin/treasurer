@@ -1,15 +1,20 @@
 module.exports = {
-    run
+    init
 };
 
-function run(ctx, opts) {
-    ctx.swagger_tools.initializeMiddleware(
-        ctx.swagger_doc, function initializeMiddleware_callback(middleware) {
-            ctx.app.use(middleware.swaggerMetadata()); // should be first
-            ctx.app.use(middleware.swaggerValidator());
-            ctx.app.use(middleware.swaggerRouter(opts));
-            ctx.app.use(middleware.swaggerUi());
-
-            ctx.run_server(ctx.app);
-        });
+function init({ app, app_ctx, no_cache, json, uuidv1 }) {
+    app.use(no_cache());
+    app.use(json());
+    app.use(function (req, res, next) {
+        req.ctx = app_ctx;
+        next();
+    });
+    app.use(function (req, res, next) {
+        req.op_id = uuidv1();
+        next();
+    });
+    app.use(function (req, res, next) {
+        res.setHeader('X-Request-ID', req.op_id);
+        next();
+    });
 }
