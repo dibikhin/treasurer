@@ -5,7 +5,7 @@ module.exports = {
 };
 
 async function balance(req, res) {
-    const Treasurer = req.ctx.Treasurer;
+    const Treasurer = req.ctx.treasurer;
     const ctx = req.ctx.treasurer_ctx;
 
     const params = {
@@ -18,7 +18,7 @@ async function balance(req, res) {
 }
 
 async function deposit(req, res) {
-    const Treasurer = req.ctx.Treasurer,
+    const Treasurer = req.ctx.treasurer,
         ctx = req.ctx.treasurer_ctx,
         body = req.swagger.params.body.value;
 
@@ -33,7 +33,7 @@ async function deposit(req, res) {
 }
 
 async function withdraw(req, res) {
-    const Treasurer = req.ctx.Treasurer,
+    const Treasurer = req.ctx.treasurer,
         ctx = req.ctx.treasurer_ctx,
         body = req.swagger.params.body.value;
 
@@ -45,16 +45,16 @@ async function withdraw(req, res) {
     const account = await Treasurer.withdraw(ctx, params);
     const response = _compose_response(account);
     return res.json(response);
-};
+}
 
 /**
  * @private
  */
 function _compose_response(account) {
-    return Object.freeze({
+    return {
         account_brief: {
             id: account._id,
             balance: parseFloat(account.balance.toString())
         }
-    });
+    };
 }

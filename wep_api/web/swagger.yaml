@@ -3,7 +3,7 @@ swagger: "2.0"
 info:
   description: "User balance storage and management. Read more at [GitHub](https://github.com/dibikhin/treasurer/blob/master/README.md)."
   version: "0.1.0"
-  title: "Tresurer"
+  title: "Treasurer"
   termsOfService: "https://github.com/dibikhin/treasurer/terms/TODO"
   contact:
     email: "dibikhin@gmail.com"
@@ -232,7 +232,7 @@ paths:
               type: "string"
               format: "uuid"
               description: "correlation Id"
-      x-swagger-router-controller: "Treasurer"
+      x-swagger-router-controller: "treasurer_controller"
   /treasurer/deposit:
     post:
       tags:
@@ -288,7 +288,7 @@ paths:
               type: "string"
               format: "uuid"
               description: "correlation Id"
-      x-swagger-router-controller: "Treasurer"
+      x-swagger-router-controller: "treasurer_controller"
   /treasurer/withdraw:
     post:
       tags:
@@ -344,7 +344,7 @@ paths:
               type: "string"
               format: "uuid"
               description: "correlation Id"
-      x-swagger-router-controller: "Treasurer"
+      x-swagger-router-controller: "treasurer_controller"
 definitions:
   AccountResponse:
     type: "object"
@@ -451,6 +451,9 @@ definitions:
         $ref: "#/definitions/AccountBrief"
   account_id:
     type: "string"
+    maxLength: 24
+    minLength: 24
+    example: "5ae6d0b30e15c70cd3240f1b"
   status:
     type: "string"
     description: "account status"
@@ -459,7 +462,7 @@ definitions:
     - "suspended"
   amount:
     type: "number"
-    example: "1.25"
+    example: 1.25
   date_time:
     type: "string"
     format: "date-time"

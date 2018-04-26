@@ -6,7 +6,7 @@ module.exports = {
     "parserOptions": {
         "ecmaVersion": 2017
     },
-
+    "extends": "eslint:recommended",
     "rules": {
         "indent": [
             "error",
@@ -16,9 +16,11 @@ module.exports = {
             "error",
             "unix"
         ],
-        "no_console": "off",
+        "no-console": "off",
+        "no-magic-numbers": ["warn"],
         "no-unused-vars": ["error"],
         "no-undef": ["error"],
+        "no-unreachable": ["error"],
         "quotes": [
             "error",
             "single"
