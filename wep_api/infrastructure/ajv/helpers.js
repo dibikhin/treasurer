@@ -11,7 +11,7 @@ function add_keyword(ajv, params) {
 
 function compile_validators(params) {
     const validators = {};
-    for (let schema_name in params.schemas) {
+    for (const schema_name in params.schemas) {
         validators[schema_name] = params.ajv.compile(params.schemas[schema_name]);
     }
     return validators;

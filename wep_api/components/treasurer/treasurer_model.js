@@ -46,8 +46,7 @@ async function deposit(ctx, params) {
 async function withdraw(ctx, params) {
     const account = await balance(ctx, params);
     const payable_params = {
-        account,
-        outgoing: params.outgoing
+        account
     };
     if (!ctx.is_payable(payable_params)) {
         throw new Error('insufficient funds');
@@ -63,14 +62,14 @@ async function withdraw(ctx, params) {
  * @param {ObjectID}    params.to       Reciever's account id
  * @param {string}      params.tranche  Decimal amount to transfer as string
  */
-async function transfer(ctx, params) {
+async function transfer(ctx, { from, to, tranche }) {
     const params_from = {
-        account_id: params.from,
-        outgoing: params.tranche
+        account_id: from,
+        outgoing: tranche
     };
     const params_to = {
-        account_id: params.to,
-        incoming: params.tranche
+        account_id: to,
+        incoming: tranche
     };
 
     const acc_from_after_withdraw = await withdraw(ctx, params_from);

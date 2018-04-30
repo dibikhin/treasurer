@@ -1,8 +1,8 @@
 module.exports = {
-    init
+    run
 };
 
-function init(ctx, opts, done) {
+async function run(ctx, opts, done) {
     ctx.swagger_tools.initializeMiddleware(
         ctx.swagger_doc, function initializeMiddleware_callback(middleware) {
             ctx.connect.use(middleware.swaggerMetadata()); // should be first
@@ -10,6 +10,6 @@ function init(ctx, opts, done) {
             ctx.connect.use(middleware.swaggerRouter(opts));
             ctx.connect.use(middleware.swaggerUi());
 
-            done(ctx.connect);
+            done({ http: ctx.http, app: ctx.connect, port: opts.port });
         });
 }

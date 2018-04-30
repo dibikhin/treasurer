@@ -2,7 +2,7 @@ swagger: "2.0"
 info:
   description: "User balance storage and management. Read more at [GitHub](https://github.com/dibikhin/treasurer/blob/master/README.md)."
   version: "0.1.0"
-  title: "Tresurer"
+  title: "Treasurer"
   termsOfService: "https://github.com/dibikhin/treasurer/terms/TODO"
   contact:
     email: "dibikhin@gmail.com"

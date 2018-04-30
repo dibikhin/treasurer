@@ -1,0 +1,9 @@
+https://blog.risingstack.com/trace-microservice-monitoring-and-debugging/
+http://ramdajs.com/
+https://www.npmjs.com/package/debug
+correlatiopn id npm
+https://danielkummer.github.io/git-flow-cheatsheet/index.html
+http://es6-features.org/#Constants
+https://github.com/i0natan/nodebestpractices
+https://svgshare.com/i/630.svg
+https://blog.risingstack.com/continuous-deployment-of-node-js-applications/

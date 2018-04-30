@@ -4,7 +4,7 @@
   "description": "",
   "main": "bootstrap.js",
   "scripts": {
-    "start": "eslint bootstrap.js && eslint app.js && eslint 'lib/**' && NODE_PATH=./lib NODE_ENV=development node --use_strict bootstrap.js",
+    "start": "eslint './' && NODE_PATH=. NODE_ENV=development node --use_strict index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Roman Dibikhin",
