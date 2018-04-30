@@ -1,6 +1,6 @@
 /**
- * Account's DB Adapter
- * @module accounts_db_adapter
+ * Treasurer DB adapter
+ * @module Treasurer_DAL
 */
 
 module.exports = {
@@ -14,7 +14,6 @@ module.exports = {
  * @param {object} ctx              Injected params
  * @param {object} ctx.accounts  Collection
  * @param {object} ctx.driver
- * @param {object} params
  */
 async function get_balance({ driver, accounts }, { account_id }) {
     const account_mongo_id = new driver.ObjectID(account_id);
@@ -51,17 +50,17 @@ async function dec_balance(ctx, { account_id, outgoing }) {
     return await _inc_balance(ctx, dec_balance_params);
 }
 
-async function _inc_balance({ accounts, driver }, params) {
-    const data = await accounts
+async function _inc_balance({ accounts, driver }, { account_id, amount }) {
+    const { value: account } = await accounts
         .findAndModify(
-            { '_id': new driver.ObjectID(params.account_id) },
+            { '_id': new driver.ObjectID(account_id) },
             [], {
                 $inc: {
-                    balance: driver.Decimal128.fromString(params.amount + '')
+                    balance: driver.Decimal128.fromString(amount + '')
                 },
                 $currentDate: {
                     updated_at: true
                 }
             }, { new: true }); // return updated doc
-    return data.value;
+    return account;
 }

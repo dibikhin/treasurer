@@ -1,0 +1,27 @@
+{
+    "spellright.language": "English (American)",
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext",
+        "javascript"
+    ],
+    "files.autoSave": "afterDelay",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.minimap.enabled": false,
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+    "javascript.referencesCodeLens.enabled": true,
+    "typescript.implementationsCodeLens.enabled": true,
+    "typescript.referencesCodeLens.enabled": true,
+    "todohighlight.keywords": [
+        "TODO",
+        "WARN"
+    ],
+    "spellright.notificationClass": "warning",
+    "window.restoreFullscreen": true,
+    "editor.tabCompletion": true,
+    "editor.codeLens": true,
+}
