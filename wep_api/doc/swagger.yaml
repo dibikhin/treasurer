@@ -15,9 +15,10 @@ tags:
 - name: "treasurer"
   description: "Operating on account balance"
 - name: "account"
-  description: "Accounts CRUD"
+  description: "Accounts CRUD NOT IMPLEMENTED"
 schemes:
 - "http"
+- "https"
 externalDocs:
   description: "Find out more at Github"
   url: "https://github.com/dibikhin/treasurer"

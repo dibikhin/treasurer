@@ -5,14 +5,17 @@
 
 console.info('Starting...');
 
+
+const serve_static = require('serve-static');
 const uuidv1 = require('uuid/v1');
-const benalu = require('node_modules/benalu/benalu'); // self built, due to old npm
-const Ajv = require('ajv');
+const benalu = require('lib/benalu/benalu'); // self built, due to an old npm
+const _ajv = require('ajv');
 
 const mongodb = require('mongodb');
 
 const http = require('http');
 const no_cache = require('nocache');
+const cors = require('cors');
 const _connect = require('connect');
 const connect = _connect();
 const json = require('res-json');
@@ -21,11 +24,13 @@ const fs = require('fs');
 
 const swagger_tools = require('swagger-tools');
 
-const infra = require('./infrastructure');
+const infra = require('infrastructure');
 
-const web = require('./web');
-const treasurer = require('./components/treasurer');
-const db = require('./components/db');
+const config = require('config');
+
+const web = require('web');
+const treasurer = require('components/treasurer');
+const db = require('components/db');
 
 const bootstrapper = { run };
 bootstrapper.run();
@@ -34,18 +39,8 @@ bootstrapper.run();
  * Config & start the app
  */
 async function run() {
-    const ajv = new Ajv({ allErrors: true });
-    infra.ajv.add_custom_keywords({ mongodb, ajv, ajv_helpers: infra.ajv.helpers });
-    const treasurer_params_validators = infra.ajv.helpers.compile_validators({
-        ajv,
-        schemas: treasurer.params_schemas
-    });
-
-    const treasurer_model_proxy = treasurer.aop_bootstrap.init({
-        infra,
-        aop_provider: benalu,
-        target: treasurer.model,
-        params_validators: treasurer_params_validators
+    const treasurer_params_validators = config.ajv.config({
+        _ajv, infra, mongo_is_valid: mongodb.ObjectID.isValid, schemas: treasurer.params_schemas
     });
 
     const contexts = {};
@@ -55,69 +50,48 @@ async function run() {
         db_adapter: treasurer.dal,
         is_payable: treasurer.threshold_strategy
     };
+    await db.connect(contexts.treasurer, config.mongo);
 
-    const mongo_opts = {
-        mongo_url: 'mongodb://localhost:27017',
-        db_name: 'test',
-        collection_name: 'accounts'
+    contexts.treasurer_aop = {
+        infra,
+        aop_provider: benalu,
+        target: treasurer.model,
+        params_validators: treasurer_params_validators
     };
-    await db.connect(contexts.treasurer, mongo_opts);
-
-    const port = 8080;
+    const treasurer_model_proxy = treasurer.aop.init(contexts.treasurer_aop);
 
     contexts.app = {
         treasurer: treasurer_model_proxy,
         treasurer_ctx: contexts.treasurer
     };
     contexts.middleware = {
-        app: connect, app_ctx: contexts.app, no_cache, json, uuidv1
+        app: connect, app_ctx: contexts.app, serve_static, no_cache, cors, json, uuidv1
     };
     await web.app.config(contexts.middleware);
 
-    const spec = fs.readFileSync('web/swagger.yaml', 'utf8');
-    const swagger_doc = js_yaml.safeLoad(spec);
-    swagger_doc.host = process.env.NODE_ENV === 'development' ? `localhost:${port}` : swagger_doc.host;
+    const swagger_doc = config.web.swagger.configure_doc({ fs, js_yaml });
     contexts.swagger = {
         http, connect, swagger_tools, swagger_doc
     };
-    const swagger_opts = {
-        port,
-        swaggerUi: 'api/swagger.yaml',
-        controllers: 'components/treasurer', // TODO fix workaround
-        useStubs: false //process.env.NODE_ENV === 'development'
-    };
-    await web.swagger.run(contexts.swagger, swagger_opts, web.server.run);
+    const swagger_opts = config.web.to_swagger_opts(config.web);
+    return await web.swagger.run(contexts.swagger, swagger_opts, web.server.run);
 }
 
 
-// 5ae6d0b30e15c70cd3240f1b
+// tid 5ae727e310184a24eabab171
 
 
-// TODO aspect: freeze returned objects
+// TODO freeze returned objects
 // TODO freeze opts & ctxs
 // TODO freeze -> clone + freeze
-// TODO remove and ban console.log
+
+// TODO eslint: remove and ban console.console.log();
+// TODO eslint: semi? https://eslint.org/docs/rules/semi
+
+// TODO introduce ENV splitting: dev, stage, prod
+
 // play with "javascript.implicitProjectConfig.checkJs": true
 
-// const Cache = require('ttl');
+// TODO ask for benalu npm update or post a private npm
 
-// const caching_strategy_factory = require('infrastructure/aspects_factories/caching_strategy_factory');
-// const error_handling_strategy_factory = require('infrastructure/aspects_factories/error_handling_strategy_factory');
-
-// const error_handling_strategy = require('infrastructure/advice/error_handling_strategy');
-
-// const helpers = require('infrastructure/helpers');
-
-// const cache_adapter = require('db/cache_adapter');
-
-// const cache = new Cache({ ttl: 30 * 1000 });
-
-// order matters, but how? caching_strategy_factory may break next interceptors
-// const accounts_db_adapter = benalu
-//     .fromInstance(accounts_db_adapter_raw)
-// // config cache 'enabled' option
-// .addInterception(
-//     caching_strategy_factory({ helpers, cache, cache_adapter }))
-// .addInterception(
-//     error_handling_strategy_factory({ helpers, logger: console }, { error_handling_strategy }))
-//     .build();
+// TODO move accounts swagger to dummy

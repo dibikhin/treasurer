@@ -24,4 +24,5 @@
     "window.restoreFullscreen": true,
     "editor.tabCompletion": true,
     "editor.codeLens": true,
+    "editor.suggestSelection": "recentlyUsedByPrefix"
 }

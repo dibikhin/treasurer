@@ -3,8 +3,9 @@ const db = require('.././components/db');
 
 (async function fill() {
     const mongo_opts = {
-        mongo_url: 'mongodb://localhost:27017',
-        db_name: 'test',
+        //mongo_url: 'mongodb://localhost:27017',
+        mongo_url: 'mongodb://:@ds261969.mlab.com:61969/treasurer',
+        db_name: 'treasurer',
         collection_name: 'accounts'
     };
     const accounts = await db.connect({ driver: mongodb }, mongo_opts);
