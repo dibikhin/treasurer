@@ -16,9 +16,10 @@ tags:
 - name: "treasurer"
   description: "Operating on account balance"
 - name: "account"
-  description: "Accounts CRUD"
+  description: "Accounts CRUD NOT IMPLEMENTED"
 schemes:
 - "http"
+- "https"
 paths:
   /accounts:
     post:
@@ -453,7 +454,7 @@ definitions:
     type: "string"
     maxLength: 24
     minLength: 24
-    example: "5ae6d0b30e15c70cd3240f1b"
+    example: "5ae727e310184a24eabab171"
   status:
     type: "string"
     description: "account status"

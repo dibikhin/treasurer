@@ -10,7 +10,8 @@ module.exports = {
 };
 
 function get_account_id(invocation) {
-    return invocation['1'].account_id; // TODO isnt generic
+    // TODO isn't generic
+    return invocation['1'].account_id;
 }
 
 function wrap_function(funktion, interceptor) {
