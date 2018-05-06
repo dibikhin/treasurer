@@ -1,3 +1,26 @@
+
+// const Cache = require('ttl');
+// const caching_strategy_factory = require('infrastructure/aspects_factories/caching_strategy_factory');
+// const error_handling_strategy_factory = require('infrastructure/aspects_factories/error_handling_strategy_factory');
+
+// const error_handling_strategy = require('infrastructure/advice/error_handling_strategy');
+
+// const helpers = require('infrastructure/helpers');
+
+// const cache_adapter = require('db/cache_adapter');
+
+// const cache = new Cache({ ttl: 30 * 1000 });
+
+// order matters, but how? caching_strategy_factory may break next interceptors
+// const accounts_db_adapter = benalu
+//     .fromInstance(accounts_db_adapter_raw)
+// // config cache 'enabled' option
+// .addInterception(
+//     caching_strategy_factory({ helpers, cache, cache_adapter }))
+// .addInterception(
+//     error_handling_strategy_factory({ helpers, logger: console }, { error_handling_strategy }))
+//     .build();
+
 // async function run_test(accounts_col) {
 //     treasurer_ctx.db = { accounts: accounts_col };
 
@@ -47,15 +70,3 @@
 //         process.exit(0);
 //     }, 1000);
 // }
-
-// // .then(() => {
-// //     const account123 = {
-// //         balance: ctx.driver.Decimal128.fromString('125.125'),
-// //         threshold: ctx.driver.Decimal128.fromString('0.125'),
-// //         state: 'active',
-// //         deleted: false,
-// //         created_at: new Date(),
-// //         updated_at: new Date()
-// //     };
-// //     ctx.accounts.insertOne(account123);
-// // })
