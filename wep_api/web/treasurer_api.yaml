@@ -15,171 +15,10 @@ basePath: "/v0"
 tags:
 - name: "treasurer"
   description: "Operating on account balance"
-- name: "account"
-  description: "Accounts CRUD NOT IMPLEMENTED"
 schemes:
 - "http"
 - "https"
 paths:
-  /accounts:
-    post:
-      tags:
-      - "account"
-      summary: "Add a new account"
-      description: "Returns the new account"
-      operationId: "add_account"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Account object that needs to be added"
-        required: true
-        schema:
-          $ref: "#/definitions/CreateAccountRequest"
-      responses:
-        200:
-          description: "Successful operation"
-          schema:
-            $ref: "#/definitions/AccountResponse"
-        405:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-      x-swagger-router-controller: "Account"
-    put:
-      tags:
-      - "account"
-      summary: "Update an existing account"
-      description: "Returns the updated account"
-      operationId: "update_account"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Account object that needs to be added"
-        required: true
-        schema:
-          $ref: "#/definitions/UpdateAccountRequest"
-      responses:
-        200:
-          description: "Successful operation"
-          schema:
-            $ref: "#/definitions/AccountResponse"
-        400:
-          description: "Invalid ID supplied"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-        404:
-          description: "Account not found"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-        405:
-          description: "Validation exception"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-      x-swagger-router-controller: "Account"
-  /accounts/{account_id}:
-    get:
-      tags:
-      - "account"
-      summary: "Find account by ID"
-      description: "Returns a single account"
-      operationId: "get_account_by_id"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "account_id"
-        in: "path"
-        required: true
-        type: "string"
-        maxLength: 24
-        minLength: 24
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/AccountResponse"
-        400:
-          description: "Invalid ID supplied"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-        404:
-          description: "Account not found"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-      x-swagger-router-controller: "Account"
-    post:
-      tags:
-      - "account"
-      summary: "Updates an account with form data"
-      description: "Returns the updated account"
-      operationId: "update_account_with_form"
-      consumes:
-      - "application/x-www-form-urlencoded"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "account_id"
-        in: "path"
-        required: true
-        type: "string"
-        maxLength: 24
-        minLength: 24
-      - name: "status"
-        in: "formData"
-        description: "Updated status of the account"
-        required: false
-        type: "string"
-        enum:
-        - "active"
-        - "suspended"
-      - name: "threshold"
-        in: "formData"
-        description: "Updated threshold of the account"
-        required: false
-        type: "number"
-      responses:
-        200:
-          description: "Successful operation"
-          schema:
-            $ref: "#/definitions/AccountResponse"
-        405:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-      x-swagger-router-controller: "Account"
-    delete:
-      tags:
-      - "account"
-      summary: "Deletes an account"
-      operationId: "delete_account"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "account_id"
-        in: "path"
-        required: true
-        type: "string"
-        maxLength: 24
-        minLength: 24
-      responses:
-        200:
-          description: "Successful operation"
-        400:
-          description: "Invalid ID supplied"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-        404:
-          description: "Account not found"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-      x-swagger-router-controller: "Account"
   /treasurer/balance/{account_id}:
     get:
       tags:
@@ -209,7 +48,7 @@ paths:
         400:
           description: "Invalid parameters"
           schema:
-            $ref: "#/definitions/ApiResponse"
+            $ref: "#/definitions/ErrorResponse"
           headers:
             X-Request-ID:
               type: "string"
@@ -218,7 +57,7 @@ paths:
         404:
           description: "Account Not Found"
           schema:
-            $ref: "#/definitions/ApiResponse"
+            $ref: "#/definitions/ErrorResponse"
           headers:
             X-Request-ID:
               type: "string"
@@ -227,7 +66,7 @@ paths:
         500:
           description: "Internal Server Error"
           schema:
-            $ref: "#/definitions/ApiResponse"
+            $ref: "#/definitions/ErrorResponse"
           headers:
             X-Request-ID:
               type: "string"
@@ -265,7 +104,7 @@ paths:
         400:
           description: "Invalid parameters"
           schema:
-            $ref: "#/definitions/ApiResponse"
+            $ref: "#/definitions/ErrorResponse"
           headers:
             X-Request-ID:
               type: "string"
@@ -274,7 +113,7 @@ paths:
         404:
           description: "Account Not Found"
           schema:
-            $ref: "#/definitions/ApiResponse"
+            $ref: "#/definitions/ErrorResponse"
           headers:
             X-Request-ID:
               type: "string"
@@ -283,7 +122,7 @@ paths:
         500:
           description: "Internal Server Error"
           schema:
-            $ref: "#/definitions/ApiResponse"
+            $ref: "#/definitions/ErrorResponse"
           headers:
             X-Request-ID:
               type: "string"
@@ -321,7 +160,7 @@ paths:
         400:
           description: "Invalid parameters"
           schema:
-            $ref: "#/definitions/ApiResponse"
+            $ref: "#/definitions/ErrorResponse"
           headers:
             X-Request-ID:
               type: "string"
@@ -330,7 +169,7 @@ paths:
         404:
           description: "Account Not Found"
           schema:
-            $ref: "#/definitions/ApiResponse"
+            $ref: "#/definitions/ErrorResponse"
           headers:
             X-Request-ID:
               type: "string"
@@ -339,7 +178,7 @@ paths:
         500:
           description: "Internal Server Error"
           schema:
-            $ref: "#/definitions/ApiResponse"
+            $ref: "#/definitions/ErrorResponse"
           headers:
             X-Request-ID:
               type: "string"
@@ -347,63 +186,12 @@ paths:
               description: "correlation Id"
       x-swagger-router-controller: "treasurer_controller"
 definitions:
-  AccountResponse:
-    type: "object"
-    properties:
-      account:
-        $ref: "#/definitions/Account"
-  Account:
-    type: "object"
-    required:
-    - "balance"
-    - "created_at_utc"
-    - "deleted"
-    - "id"
-    - "status"
-    - "threshold"
-    - "updated_at_utc"
-    properties:
-      id:
-        $ref: "#/definitions/account_id"
-      balance:
-        $ref: "#/definitions/amount"
-      threshold:
-        $ref: "#/definitions/amount"
-      status:
-        $ref: "#/definitions/status"
-      deleted:
-        type: "boolean"
-        description: "read only, 'delete' sets this implicitly"
-      created_at_utc:
-        $ref: "#/definitions/date_time"
-      updated_at_utc:
-        $ref: "#/definitions/date_time"
-  CreateAccountRequest:
-    type: "object"
-    required:
-    - "balance"
-    - "threshold"
-    properties:
-      balance:
-        $ref: "#/definitions/amount"
-      threshold:
-        $ref: "#/definitions/amount"
-  UpdateAccountRequest:
-    type: "object"
-    required:
-    - "account_id"
-    properties:
-      account_id:
-        $ref: "#/definitions/account_id"
-      status:
-        $ref: "#/definitions/status"
-      threshold:
-        $ref: "#/definitions/amount"
-  ApiResponse:
+  ErrorResponse:
     type: "object"
     required:
     - "code"
     - "detail"
+    - "timestamp"
     - "title"
     properties:
       code:
@@ -413,6 +201,8 @@ definitions:
         type: "string"
       detail:
         type: "string"
+      timestamp:
+        $ref: "#/definitions/date_time"
   WithdrawalRequest:
     type: "object"
     required:
@@ -447,20 +237,15 @@ definitions:
     type: "object"
     required:
     - "account_brief"
+    - "timestamp"
     properties:
       account_brief:
         $ref: "#/definitions/AccountBrief"
+      timestamp:
+        $ref: "#/definitions/date_time"
   account_id:
     type: "string"
-    maxLength: 24
-    minLength: 24
     example: "5ae727e310184a24eabab171"
-  status:
-    type: "string"
-    description: "account status"
-    enum:
-    - "active"
-    - "suspended"
   amount:
     type: "number"
     example: 1.25
@@ -480,7 +265,7 @@ responses:
   ErrorBadRequest:
     description: "Invalid parameters"
     schema:
-      $ref: "#/definitions/ApiResponse"
+      $ref: "#/definitions/ErrorResponse"
     headers:
       X-Request-ID:
         type: "string"
@@ -489,7 +274,7 @@ responses:
   ErrorNotFound:
     description: "Account Not Found"
     schema:
-      $ref: "#/definitions/ApiResponse"
+      $ref: "#/definitions/ErrorResponse"
     headers:
       X-Request-ID:
         type: "string"
@@ -498,7 +283,7 @@ responses:
   ErrorServerError:
     description: "Internal Server Error"
     schema:
-      $ref: "#/definitions/ApiResponse"
+      $ref: "#/definitions/ErrorResponse"
     headers:
       X-Request-ID:
         type: "string"

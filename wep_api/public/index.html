@@ -16,14 +16,16 @@
 
 <body>
     <div class="container">
-        <h1>Treasurer Demo</h1>
-        <p class="lead">New operation every second: Balance, Withdraw or Deposit</p>
-
-        <p class="lead">Stare below or check Swagger
+        <h1>Treasurer Demo
+            <span class="badge badge-info">v.0.1.0 5/14/2018</span>
+        </h1>
+        <p class="lead">New operation every second: Balance, Withdraw or Deposit. Stare below or check Swagger
             <a target="_blank" href="/docs">
                 docs
             </a>
         </p>
+
+        <h3>Ledger</h3>
 
         <div class="row">
             <div class="col">
@@ -60,8 +62,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.0/underscore-min.js"></script>
 
-    <script src="js/main.js"></script>
-
     <script>
         $(document).ready(function run_demo() {
             $.ajaxSetup({
@@ -82,11 +82,9 @@
                 withdraw(account_id);
             }
 
-            // TODO localhost vs demohost
-
             function balance(account_id) {
                 const bound_add_row = add_row.bind({ operation: 'balance' });
-                $.get('https://treasurer-demo-1.now.sh/v0/treasurer/balance/' + account_id)
+                $.get('/v0/treasurer/balance/' + account_id)
                     .done(bound_add_row);
             }
 
@@ -96,7 +94,7 @@
                 const bound_add_row = add_row.bind({ operation: 'deposit', amount: deposit_request.incoming });
 
                 $.post(
-                    'https://treasurer-demo-1.now.sh/v0/treasurer/deposit', deposit_request_json, null, 'json')
+                    '/v0/treasurer/deposit', deposit_request_json, null, 'json')
                     .done(bound_add_row);
             }
 
@@ -106,7 +104,7 @@
                 const bound_add_row = add_row.bind({ operation: 'withdraw', amount: withdraw_request.outgoing });
 
                 $.post(
-                    'https://treasurer-demo-1.now.sh/v0/treasurer/withdraw', withdraw_request_json, null, 'json')
+                    '/v0/treasurer/withdraw', withdraw_request_json, null, 'json')
                     .done(bound_add_row);
             }
 
