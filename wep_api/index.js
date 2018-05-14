@@ -5,8 +5,6 @@
 
 console.info('Starting...');
 
-
-const serve_static = require('serve-static');
 const uuidv1 = require('uuid/v1');
 const benalu = require('lib/benalu/benalu'); // self built, due to an old npm
 const _ajv = require('ajv');
@@ -14,10 +12,14 @@ const _ajv = require('ajv');
 const mongodb = require('mongodb');
 
 const http = require('http');
+
+const serve_static = require('serve-static');
 const no_cache = require('nocache');
+const favicon = require('serve-favicon');
 const cors = require('cors');
 const _connect = require('connect');
 const connect = _connect();
+
 const json = require('res-json');
 const js_yaml = require('js-yaml');
 const fs = require('fs');
@@ -65,15 +67,23 @@ async function run() {
         treasurer_ctx: contexts.treasurer
     };
     contexts.middleware = {
-        app: connect, app_ctx: contexts.app, serve_static, no_cache, cors, json, uuidv1
+        app: connect, app_ctx: contexts.app, favicon, serve_static, no_cache, cors, json, generate_op_id: uuidv1
     };
     await web.app.config(contexts.middleware);
 
-    const swagger_doc = config.web.swagger.configure_doc({ fs, js_yaml });
+    const swagger_doc = config.web.swagger.configure_doc({ fs, js_yaml, port: config.web.port, swagger: config.web.swagger });
     contexts.swagger = {
         http, connect, swagger_tools, swagger_doc
     };
-    const swagger_opts = config.web.to_swagger_opts(config.web);
+
+    // TODO isn't generic
+    const controllers = {
+        'treasurer_controller_balance': treasurer.controller.balance,
+        'treasurer_controller_deposit': treasurer.controller.deposit,
+        'treasurer_controller_withdraw': treasurer.controller.withdraw,
+    };
+
+    const swagger_opts = config.web.to_swagger_opts(config.web, controllers);
     return await web.swagger.run(contexts.swagger, swagger_opts, web.server.run);
 }
 
@@ -81,17 +91,8 @@ async function run() {
 // tid 5ae727e310184a24eabab171
 
 
-// TODO freeze returned objects
-// TODO freeze opts & ctxs
-// TODO freeze -> clone + freeze
-
+// TODO ask for benalu npm update or post a private npm
 // TODO eslint: remove and ban console.console.log();
 // TODO eslint: semi? https://eslint.org/docs/rules/semi
-
-// TODO introduce ENV splitting: dev, stage, prod
-
-// play with "javascript.implicitProjectConfig.checkJs": true
-
-// TODO ask for benalu npm update or post a private npm
-
-// TODO move accounts swagger to dummy
+// TODO ban string literals, move to config
+// TODO play with "javascript.implicitProjectConfig.checkJs": true

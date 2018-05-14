@@ -52,6 +52,7 @@ async function withdraw(req, res) {
  */
 function _compose_response(account) {
     return {
+        timestamp: new Date().toISOString(),
         account_brief: {
             id: account._id,
             balance: parseFloat(account.balance.toString())

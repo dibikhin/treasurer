@@ -1,0 +1,69 @@
+docs
+    draft (idea, vision)
+    specs
+    - api (swagger)
+    - bdd specs
+    domain
+    - entities
+    - attributes
+    - actions (api)
+    - interactions (protocol, sequence)
+
+start with client and tests
+
+deployment
+- demo (heroku?)
+- containers (docker?)
+- db
+
+project
+- repo (bitbucket/gh)
+- ci (gh/travis?)
+- tasks (grunt|gulp)
+- package.json
+    - lock
+    - save-dev
+    - start
+    - test
+
+cq
+- tests
+- precommit
+- linter
+- formatter
+- style
+- duplicates
+- coverage
+
+code
+    - ioc
+    - aop
+    - client
+    - web
+    - domain
+    - db
+    aspects
+    - logging
+    - configs
+    - error handling
+    - validation (ajv/swagger)
+    - persistance
+
+    - auditing
+    - tracing
+    - transactions
+    - caching
+    - monitoring
+
+services
+- logging (loggly/graylog/logstash?)
+- configs (apache)
+- error handling n/a
+- validation n/a
+- persistance (redis, mongo, eventstore)
+
+- auditing
+- tracing
+- transactions 
+- caching (memcached/redis)
+- monitoring

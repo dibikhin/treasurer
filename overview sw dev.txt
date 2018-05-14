@@ -1,0 +1,27 @@
+development
+maintainance - sw|hw|logs, mons
+
+dev cycles
+
+prd https://en.wikipedia.org/wiki/Product_requirements_document
+targets, objectives (tasks), resources (human, sw, hw)
+
+deployment, ci, cd, tests, repo, docs
+
+https://en.wikipedia.org/wiki/Project_plan
+
+mvp|product
+
+docs, code
+
+business analysis
+technical analysis
+development
+my testing q/a
+
+analysis-development-testing
+your testing q/a
+
+purpose -> repo -> prd -> text specs -> test specs -> swagger -> cli -> serv
+
+
