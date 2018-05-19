@@ -2,6 +2,16 @@
 <html lang="en">
 
 <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-119545622-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-119545622-1');
+    </script>
+
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -62,74 +72,10 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.0/underscore-min.js"></script>
 
-    <script>
-        $(document).ready(function run_demo() {
-            $.ajaxSetup({
-                contentType: 'application/json; charset=utf-8'
-            });
+    <script type="module">
+        import { run_demo } from '/js/main.js';
 
-            const account_id = '5ae727e310184a24eabab171';
-
-            demo(account_id);
-
-            setInterval(() => {
-                demo(account_id)
-            }, 5000);
-
-            function demo(account_id) {
-                balance(account_id);
-                deposit(account_id);
-                withdraw(account_id);
-            }
-
-            function balance(account_id) {
-                const bound_add_row = add_row.bind({ operation: 'balance' });
-                $.get('/v0/treasurer/balance/' + account_id)
-                    .done(bound_add_row);
-            }
-
-            function deposit(account_id) {
-                const deposit_request = { account_id, incoming: 1.25 };
-                const deposit_request_json = JSON.stringify(deposit_request);
-                const bound_add_row = add_row.bind({ operation: 'deposit', amount: deposit_request.incoming });
-
-                $.post(
-                    '/v0/treasurer/deposit', deposit_request_json, null, 'json')
-                    .done(bound_add_row);
-            }
-
-            function withdraw(account_id) {
-                const withdraw_request = { account_id, outgoing: 1.25 };
-                const withdraw_request_json = JSON.stringify(withdraw_request);
-                const bound_add_row = add_row.bind({ operation: 'withdraw', amount: withdraw_request.outgoing });
-
-                $.post(
-                    '/v0/treasurer/withdraw', withdraw_request_json, null, 'json')
-                    .done(bound_add_row);
-            }
-
-            function add_row(data) {
-                const html_template = "<tr> \
-                    <td> <%- moment %> </td> \
-                    <td> <%- operation %> </td> \
-                    <td> <%- id %> </td> \
-                    <td> <%- amount %> </td> \
-                    <td> <%- final_balance %> </td> \
-                </tr>";
-
-                const account_brief = data.account_brief;
-                const table_row = {
-                    moment: new Date().toLocaleString(),
-                    operation: this.operation.toUpperCase(),
-                    id: account_brief.id,
-                    amount: this.amount || '-',
-                    final_balance: account_brief.balance
-                };
-                const format = _.template(html_template);
-                const filled_template = format(table_row);
-                $('#ops tr:first').before(filled_template);
-            }
-        });
+        run_demo($, document, _);
     </script>
 
 </body>
