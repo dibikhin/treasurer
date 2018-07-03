@@ -3,6 +3,7 @@ module.exports = _init();
 function _init() {
     const web = {};
     web.port = process.env.PORT || 8080;
+    web.treasurer_controller_prefix = 'treasurer_controller_';
 
     web.swagger = {
         ui_path: 'web/treasurer_api.yaml',

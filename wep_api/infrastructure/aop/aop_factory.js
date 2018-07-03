@@ -1,9 +1,9 @@
 module.exports = {
-    init
+    create
 };
 
-function init({ infra, aop_provider, target, params_validators }) {
-    return infra.aop.add_interceptions({
+function create({ infra, aop_provider, target, params_validators }) {
+    return infra.aop.helpers.add_interceptions({
         aop_provider,
         target,
         interceptions: [

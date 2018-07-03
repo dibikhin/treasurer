@@ -7,7 +7,7 @@ console.info('Starting...');
 
 const uuidv1 = require('uuid/v1');
 const benalu = require('lib/benalu/benalu'); // self built, due to an old npm
-const _ajv = require('ajv');
+const ajv = require('ajv');
 
 const mongodb = require('mongodb');
 
@@ -28,7 +28,7 @@ const swagger_tools = require('swagger-tools');
 
 const infra = require('infrastructure');
 
-const config = require('config');
+const configs = require('configs');
 
 const web = require('web');
 const treasurer = require('components/treasurer');
@@ -37,54 +37,78 @@ const db = require('components/db');
 const bootstrapper = { run };
 bootstrapper.run();
 
-/**
- * Config & start the app
- */
 async function run() {
-    const treasurer_params_validators = config.ajv.config({
-        _ajv, infra, mongo_is_valid: mongodb.ObjectID.isValid, schemas: treasurer.params_schemas
+    const contexts = {};
+    contexts.treasurer = {};
+    contexts.treasurer.dal = { driver: mongodb };
+
+    await db.connect(contexts.treasurer.dal, configs.mongo);
+
+    configs.treasurer = {};
+    configs.treasurer.params_validators = configs.ajv.configure({
+        ajv, infra, mongo_is_valid: mongodb.ObjectID.isValid, schemas: treasurer.params_schemas
     });
 
-    const contexts = {};
+    configure_web_app({ web, contexts });
+    configure_swagger({ configs, contexts });
 
-    contexts.treasurer = {
-        driver: mongodb,
-        db_adapter: treasurer.dal,
+    // WARN spaghetti references?
+    const treasurer_model_proxy = create_treasurer_model_proxy({ infra, configs, contexts, treasurer });
+    contexts.treasurer.model.Model = treasurer_model_proxy;
+
+    const swagger_opts = create_swagger_opts({ infra, configs, contexts, treasurer });
+    return web.swagger.run(contexts.swagger, swagger_opts, web.server.run);
+}
+
+/**
+ * privates
+ */
+
+function configure_web_app({ web, contexts }) {
+    contexts.middleware = {
+        app: connect, favicon, serve_static, no_cache, cors, json, generate_op_id: uuidv1
+    };
+    return web.app.configure(contexts.middleware);
+}
+
+function configure_swagger({ contexts, configs }) {
+    const swagger_doc = configs.web.swagger.configure_doc({
+        fs, js_yaml, port: configs.web.port, swagger: configs.web.swagger
+    });
+    contexts.swagger = {
+        http, connect, swagger_tools, swagger_doc
+    };
+}
+
+function create_treasurer_model_proxy({ infra, configs, contexts, treasurer }) {
+    // bake dal
+    const treasurer_dal = infra.helpers.bake_context(treasurer.dal, contexts.treasurer.dal);
+    contexts.treasurer.model = {
+        Dal: treasurer_dal,
         is_payable: treasurer.threshold_strategy
     };
-    await db.connect(contexts.treasurer, config.mongo);
+    // bake model
+    // WARN bake -> aopize -> use
+    const treasurer_model_baked = infra.helpers.bake_context(treasurer.model, contexts.treasurer.model);
 
     contexts.treasurer_aop = {
         infra,
         aop_provider: benalu,
-        target: treasurer.model,
-        params_validators: treasurer_params_validators
+        target: treasurer_model_baked,
+        params_validators: configs.treasurer.params_validators
     };
-    const treasurer_model_proxy = treasurer.aop.init(contexts.treasurer_aop);
-
+    const treasurer_model_proxy = infra.aop.factory.create(contexts.treasurer_aop);
     contexts.app = {
-        treasurer: treasurer_model_proxy,
-        treasurer_ctx: contexts.treasurer
+        Treasurer: treasurer_model_proxy
     };
-    contexts.middleware = {
-        app: connect, app_ctx: contexts.app, favicon, serve_static, no_cache, cors, json, generate_op_id: uuidv1
-    };
-    await web.app.config(contexts.middleware);
+    return treasurer_model_proxy;
+}
 
-    const swagger_doc = config.web.swagger.configure_doc({ fs, js_yaml, port: config.web.port, swagger: config.web.swagger });
-    contexts.swagger = {
-        http, connect, swagger_tools, swagger_doc
-    };
-
-    // TODO isn't generic
-    const controllers = {
-        'treasurer_controller_balance': treasurer.controller.balance,
-        'treasurer_controller_deposit': treasurer.controller.deposit,
-        'treasurer_controller_withdraw': treasurer.controller.withdraw,
-    };
-
-    const swagger_opts = config.web.to_swagger_opts(config.web, controllers);
-    return await web.swagger.run(contexts.swagger, swagger_opts, web.server.run);
+function create_swagger_opts({ infra, configs, contexts, treasurer }) {
+    const controller = infra.web.helpers.prepare_controller(configs.web.treasurer_controller_prefix, treasurer.controller);
+    const controller_baked = infra.helpers.bake_context(controller, contexts.app);
+    const swagger_opts = configs.web.to_swagger_opts(configs.web, controller_baked);
+    return swagger_opts;
 }
 
 
@@ -92,7 +116,9 @@ async function run() {
 
 
 // TODO ask for benalu npm update or post a private npm
-// TODO eslint: remove and ban console.console.log();
-// TODO eslint: semi? https://eslint.org/docs/rules/semi
-// TODO ban string literals, move to config
 // TODO play with "javascript.implicitProjectConfig.checkJs": true
+
+// TODO eslint: remove and ban console.console.log();
+// TODO ban string literals, move to config
+// TODO eslint: semi? https://eslint.org/docs/rules/semi
+// TODO convert to es6 modules

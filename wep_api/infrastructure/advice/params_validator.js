@@ -1,3 +1,5 @@
+const util = require('util');
+
 module.exports = is_params_valid;
 
 /**
@@ -6,13 +8,13 @@ module.exports = is_params_valid;
  * @param {function} validate
  * @param {string} member_name
  */
-function is_params_valid(params) {
-    const valid = params.validate(params.target);
+function is_params_valid({ validate, target, member_name }) {
+    const valid = validate(target);
     if (!valid) {
         throw new Error(
-            `params is invalid. function: ${params.member_name},
-             params: ${JSON.stringify(params.target)},
-             errors: ${JSON.stringify(params.validate.errors)}`);
+            `params is invalid. function: ${member_name},
+             params: ${util.inspect(target)},
+             errors: ${util.inspect(validate.errors)}`);
     }
     return true;
 }
