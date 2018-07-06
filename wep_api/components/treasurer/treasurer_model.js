@@ -6,7 +6,7 @@
 
 module.exports = {
     balance, deposit, withdraw, transfer
-};
+}
 
 /**
  * Gets balance
@@ -17,7 +17,7 @@ module.exports = {
  * @param {string}      params.op_id        Correlation Id
  */
 async function balance({ Dal }, params) {
-    return await Dal.get_balance(params);
+    return await Dal.get_balance(params)
 }
 
 /**
@@ -29,7 +29,7 @@ async function balance({ Dal }, params) {
  * @param {string}      params.incoming     Decimal amount to store as string
  */
 async function deposit({ Dal }, params) {
-    return await Dal.inc_balance(params);
+    return await Dal.inc_balance(params)
 }
 
 /**
@@ -41,13 +41,13 @@ async function deposit({ Dal }, params) {
  * @param {string}      params.outgoing     Decimal amount to spend as string
  */
 async function withdraw({ Dal, Model, is_payable }, { op_id, account_id, outgoing }) {
-    const account = await Model.balance({ op_id, account_id });
+    const account = await Model.balance({ op_id, account_id })
 
-    const threshold_params = { account };
+    const threshold_params = { account }
     if (!is_payable(threshold_params)) {
-        throw new Error('insufficient funds'); // TODO -> configs
+        throw new Error('insufficient funds') // TODO -> configs
     }
-    return await Dal.dec_balance({ op_id, account_id, outgoing });
+    return await Dal.dec_balance({ op_id, account_id, outgoing })
 }
 
 /**
@@ -61,14 +61,14 @@ async function withdraw({ Dal, Model, is_payable }, { op_id, account_id, outgoin
 async function transfer({ Model }, { from, to, tranche }) {
     const params_from = {
         account_id: from, outgoing: tranche
-    };
+    }
     const params_to = {
         account_id: to, incoming: tranche
-    };
-    const acc_from_after_withdraw = await Model.withdraw(params_from);
-    const acc_to_after_deposit = await Model.deposit(params_to);
+    }
+    const acc_from_after_withdraw = await Model.withdraw(params_from)
+    const acc_to_after_deposit = await Model.deposit(params_to)
     return {
         from: acc_from_after_withdraw,
         to: acc_to_after_deposit
-    };
+    }
 }

@@ -1,6 +1,6 @@
 module.exports = {
     create
-};
+}
 
 function create({ infra, aop_provider, target, params_validators }) {
     return infra.aop.helpers.add_interceptions({
@@ -15,5 +15,5 @@ function create({ infra, aop_provider, target, params_validators }) {
                 params_validator_advice: infra.advice.params_validator
             })
         ]
-    });
+    })
 }

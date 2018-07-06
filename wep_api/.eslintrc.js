@@ -28,7 +28,9 @@ module.exports = {
         ],
         "semi": [
             "error",
-            "always"
+            "never", {
+                "beforeStatementContinuationChars": "always"
+            }
         ]
     }
-};
+}
