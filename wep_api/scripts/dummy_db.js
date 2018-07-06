@@ -1,4 +1,4 @@
-const mongodb = require('mongodb');
+const mongodb = require('mongodb')
 const db = require('.././components/db');
 
 (async function fill() {
@@ -7,8 +7,8 @@ const db = require('.././components/db');
         mongo_url: 'mongodb://:@ds261969.mlab.com:61969/treasurer',
         db_name: 'treasurer',
         collection_name: 'accounts'
-    };
-    const accounts = await db.connect({ driver: mongodb }, mongo_opts);
+    }
+    const accounts = await db.connect({ driver: mongodb }, mongo_opts)
 
     const an_account = {
         balance: mongodb.Decimal128.fromString('289.125'),
@@ -17,9 +17,9 @@ const db = require('.././components/db');
         deleted: false,
         created_at: new Date(),
         updated_at: new Date()
-    };
-    const new_account = await accounts.insertOne(an_account);
-    console.log('Inserted:');
-    console.log(new_account.ops);
-    process.exit(0);
-})();
+    }
+    const new_account = await accounts.insertOne(an_account)
+    console.log('Inserted:')
+    console.log(new_account.ops)
+    process.exit(0)
+})()
