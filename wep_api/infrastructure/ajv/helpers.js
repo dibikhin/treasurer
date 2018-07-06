@@ -1,6 +1,7 @@
+const { map, mergeAll, pipe } = require('ramda');
+
 module.exports = {
-    add_keyword,
-    compile_validators
+    add_keyword, compile_validators
 };
 
 function add_keyword(ajv, params) {
@@ -9,10 +10,8 @@ function add_keyword(ajv, params) {
     return ajv;
 }
 
-function compile_validators(params) {
-    const validators = {};
-    for (const schema_name in params.schemas) {
-        validators[schema_name] = params.ajv.compile(params.schemas[schema_name]);
-    }
-    return validators;
+function compile_validators({ ajv, schemas }) {
+    const compile_all = map(schema => ajv.compile(schema));
+    const generate_validators = pipe(compile_all, mergeAll);
+    return generate_validators(schemas);
 }

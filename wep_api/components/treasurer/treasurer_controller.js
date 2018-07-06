@@ -1,50 +1,28 @@
+const { pipeP } = require('ramda');
+
 module.exports = {
-    balance,
-    deposit,
-    withdraw
+    balance, deposit, withdraw
 };
 
-async function balance(req, res) {
-    const Treasurer = req.ctx.treasurer;
-    const ctx = req.ctx.treasurer_ctx;
-
+async function balance({ Treasurer }, req, res) {
     const params = {
-        op_id: req.op_id,
-        account_id: req.swagger.params.account_id.value
+        account_id: req.params.account_id.value
     };
-    const account = await Treasurer.balance(ctx, params);
-    const response = _compose_response(account);
-    return res.json(response);
+    params.op_id = req.op_id;
+    const get_response_json = pipeP(Treasurer.balance, _compose_response, res.json);
+    return get_response_json(params);
 }
 
-async function deposit(req, res) {
-    const Treasurer = req.ctx.treasurer,
-        ctx = req.ctx.treasurer_ctx,
-        body = req.swagger.params.body.value;
-
-    const params = {
-        op_id: req.op_id,
-        account_id: body.account_id,
-        incoming: body.incoming,
-    };
-    const account = await Treasurer.deposit(ctx, params);
-    const response = _compose_response(account);
-    return res.json(response);
+async function deposit({ Treasurer }, req, res) {
+    req.params.op_id = req.op_id;
+    const get_response_json = pipeP(Treasurer.deposit, _compose_response, res.json);
+    return get_response_json(req.params);
 }
 
-async function withdraw(req, res) {
-    const Treasurer = req.ctx.treasurer,
-        ctx = req.ctx.treasurer_ctx,
-        body = req.swagger.params.body.value;
-
-    const params = {
-        op_id: req.op_id,
-        account_id: body.account_id,
-        outgoing: body.outgoing,
-    };
-    const account = await Treasurer.withdraw(ctx, params);
-    const response = _compose_response(account);
-    return res.json(response);
+async function withdraw({ Treasurer }, req, res) {
+    req.params.op_id = req.op_id;
+    const get_response_json = pipeP(Treasurer.withdraw, _compose_response, res.json);
+    return get_response_json(req.params);
 }
 
 /**
@@ -52,9 +30,9 @@ async function withdraw(req, res) {
  */
 function _compose_response(account) {
     return {
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toISOString(), // TODO move to headers
         account_brief: {
-            id: account._id,
+            id: account._id, // TODO _id -> id
             balance: parseFloat(account.balance.toString())
         }
     };

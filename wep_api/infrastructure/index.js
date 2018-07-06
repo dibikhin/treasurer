@@ -1,4 +1,11 @@
-module.exports.aop = require('./aop');
+module.exports.aop = {};
+module.exports.aop.helpers = require('./aop/helpers');
+module.exports.aop.factory = require('./aop/aop_factory');
+
+module.exports.web = {};
+module.exports.web.helpers = require('./web/helpers');
+
+module.exports.helpers = require('./helpers');
 
 // module.exports.advice.error_handling_strategy = require('./advice/error_handling_strategy');
 
