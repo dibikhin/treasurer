@@ -1,11 +1,11 @@
+const { forEach } = require('ramda');
+
 module.exports = {
     add_interceptions
 };
 
 function add_interceptions({ aop_provider, target, interceptions }) {
     const proxy = aop_provider.fromInstance(target);
-    for (const interceptor of interceptions) {
-        proxy.addInterception(interceptor);
-    }
+    forEach(x => proxy.addInterception(x), interceptions);
     return proxy.build();
 }

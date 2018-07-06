@@ -5,53 +5,49 @@
  */
 
 module.exports = {
-    balance,
-    deposit,
-    withdraw,
-    transfer
+    balance, deposit, withdraw, transfer
 };
 
 /**
  * Gets balance
  * @param {object}      ctx                 Injected params
- * @param {object}      ctx.db_adapter
+ * @param {object}      ctx.Dal
  * @param {object}      params
  * @param {ObjectID}    params.account_id
  * @param {string}      params.op_id        Correlation Id
  */
-async function balance(ctx, params) {
-    return await ctx.db_adapter.get_balance(ctx, params);
+async function balance({ Dal }, params) {
+    return await Dal.get_balance(params);
 }
 
 /**
  * Stores funds
  * @param {object}      ctx                 Injected params
- * @param {object}      ctx.db_adapter
+ * @param {object}      ctx.Dal
  * @param {object}      params
  * @param {ObjectID}    params.account_id
  * @param {string}      params.incoming     Decimal amount to store as string
  */
-async function deposit(ctx, params) {
-    return await ctx.db_adapter.inc_balance(ctx, params);
+async function deposit({ Dal }, params) {
+    return await Dal.inc_balance(params);
 }
 
 /**
  * Spends funds
  * @param {object}      ctx                 Injected params
- * @param {object}      ctx.db_adapter
+ * @param {object}      ctx.Dal
  * @param {object}      params
  * @param {ObjectID}    params.account_id
  * @param {string}      params.outgoing     Decimal amount to spend as string
  */
-async function withdraw(ctx, params) {
-    const account = await balance(ctx, params);
-    const payable_params = {
-        account
-    };
-    if (!ctx.is_payable(payable_params)) {
-        throw new Error('insufficient funds');
+async function withdraw({ Dal, Model, is_payable }, { op_id, account_id, outgoing }) {
+    const account = await Model.balance({ op_id, account_id });
+
+    const threshold_params = { account };
+    if (!is_payable(threshold_params)) {
+        throw new Error('insufficient funds'); // TODO -> configs
     }
-    return await ctx.db_adapter.dec_balance(ctx, params);
+    return await Dal.dec_balance({ op_id, account_id, outgoing });
 }
 
 /**
@@ -62,19 +58,15 @@ async function withdraw(ctx, params) {
  * @param {ObjectID}    params.to       Reciever's account id
  * @param {string}      params.tranche  Decimal amount to transfer as string
  */
-async function transfer(ctx, { from, to, tranche }) {
+async function transfer({ Model }, { from, to, tranche }) {
     const params_from = {
-        account_id: from,
-        outgoing: tranche
+        account_id: from, outgoing: tranche
     };
     const params_to = {
-        account_id: to,
-        incoming: tranche
+        account_id: to, incoming: tranche
     };
-
-    const acc_from_after_withdraw = await withdraw(ctx, params_from);
-    const acc_to_after_deposit = await deposit(ctx, params_to);
-
+    const acc_from_after_withdraw = await Model.withdraw(params_from);
+    const acc_to_after_deposit = await Model.deposit(params_to);
     return {
         from: acc_from_after_withdraw,
         to: acc_to_after_deposit
