@@ -5,7 +5,7 @@
 
 module.exports = {
     get_balance, inc_balance, dec_balance
-};
+}
 
 /**
  * Gets balance
@@ -14,8 +14,8 @@ module.exports = {
  * @param {object} ctx.driver
  */
 async function get_balance({ driver, accounts }, { account_id }) {
-    const account_mongo_id = new driver.ObjectID(account_id);
-    return await accounts.findOne({ _id: account_mongo_id });
+    const account_mongo_id = new driver.ObjectID(account_id)
+    return await accounts.findOne({ _id: account_mongo_id })
 }
 
 /**
@@ -26,8 +26,8 @@ async function get_balance({ driver, accounts }, { account_id }) {
  * @param {object} params
  */
 async function inc_balance(ctx, { account_id, incoming: amount }) {
-    const inc_balance_params = { account_id, amount };
-    return await _inc_balance(ctx, inc_balance_params);
+    const inc_balance_params = { account_id, amount }
+    return await _inc_balance(ctx, inc_balance_params)
 }
 
 /**
@@ -40,8 +40,8 @@ async function inc_balance(ctx, { account_id, incoming: amount }) {
 async function dec_balance(ctx, { account_id, outgoing }) {
     const dec_balance_params = {
         account_id, amount: - outgoing // 'minus' is for mongo
-    };
-    return await _inc_balance(ctx, dec_balance_params);
+    }
+    return await _inc_balance(ctx, dec_balance_params)
 }
 
 /**
@@ -61,6 +61,6 @@ async function _inc_balance({ accounts, driver }, { account_id, amount }) {
                 $currentDate: {
                     updated_at: true
                 }
-            }, { returnNewDocument: true });
-    return account;
+            }, { returnNewDocument: true })
+    return account
 }
