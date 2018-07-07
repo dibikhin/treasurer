@@ -129,6 +129,62 @@ paths:
               format: "uuid"
               description: "correlation Id"
       x-swagger-router-controller: "treasurer_controller"
+  /treasurer/transfer:
+    post:
+      tags:
+      - "treasurer"
+      summary: "transfer funds"
+      description: "Returns the accounts brief after transfer"
+      operationId: "transfer"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Object with parameters of transfer"
+        required: true
+        schema:
+          $ref: "#/definitions/TransferRequest"
+      responses:
+        200:
+          description: "Successful transfer operation"
+          schema:
+            $ref: "#/definitions/TreasurerTransferResponse"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
+        400:
+          description: "Invalid parameters"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
+        404:
+          description: "Account Not Found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+          headers:
+            X-Request-ID:
+              type: "string"
+              format: "uuid"
+              description: "correlation Id"
+      x-swagger-router-controller: "treasurer_controller"
   /treasurer/withdraw:
     post:
       tags:
@@ -191,7 +247,7 @@ definitions:
     required:
     - "code"
     - "detail"
-    - "timestamp"
+    #- "timestamp"
     - "title"
     properties:
       code:
@@ -201,8 +257,8 @@ definitions:
         type: "string"
       detail:
         type: "string"
-      timestamp:
-        $ref: "#/definitions/date_time"
+    #  timestamp:
+    #    $ref: "#/definitions/date_time"
   WithdrawalRequest:
     type: "object"
     required:
@@ -223,6 +279,19 @@ definitions:
         $ref: "#/definitions/account_id"
       incoming:
         $ref: "#/definitions/amount"
+  TransferRequest:
+    type: "object"
+    required:
+    - "from"
+    - "to"
+    - "tranche"
+    properties:
+      from:
+        $ref: "#/definitions/account_id"
+      to:
+        $ref: "#/definitions/account_id"
+      tranche:
+        $ref: "#/definitions/amount"
   AccountBrief:
     type: "object"
     required:
@@ -233,16 +302,29 @@ definitions:
         $ref: "#/definitions/account_id"
       balance:
         $ref: "#/definitions/amount"
+  TreasurerTransferResponse:
+    type: "object"
+    required:
+    - "from"
+    # - "timestamp"
+    - "to"
+    properties:
+      from:
+        $ref: "#/definitions/AccountBrief"
+      to:
+        $ref: "#/definitions/AccountBrief"
+      timestamp:
+        $ref: "#/definitions/date_time"
   TreasurerResponse:
     type: "object"
     required:
     - "account_brief"
-    - "timestamp"
+    # - "timestamp"
     properties:
       account_brief:
         $ref: "#/definitions/AccountBrief"
-      timestamp:
-        $ref: "#/definitions/date_time"
+      # timestamp:
+        # $ref: "#/definitions/date_time"
   account_id:
     type: "string"
     example: "5ae727e310184a24eabab171"
@@ -293,6 +375,15 @@ responses:
     description: "Successful operation"
     schema:
       $ref: "#/definitions/TreasurerResponse"
+    headers:
+      X-Request-ID:
+        type: "string"
+        format: "uuid"
+        description: "correlation Id"
+  TreasurerTransferOK:
+    description: "Successful transfer operation"
+    schema:
+      $ref: "#/definitions/TreasurerTransferResponse"
     headers:
       X-Request-ID:
         type: "string"

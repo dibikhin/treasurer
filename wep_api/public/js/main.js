@@ -1,16 +1,16 @@
-export function run_demo(jQuery, document, _) {
+export function run_demo(jQuery, document, _, opts) {
     jQuery(document).ready(function run_demo() {
         jQuery.ajaxSetup({
             contentType: 'application/json; charset=utf-8'
         });
-
-        const account_id = '5ae727e310184a24eabab171';
-
-        _demo(account_id);
-
-        setInterval(() => {
+        const run_demo = account_id => {
             _demo(account_id);
-        }, 5000);
+
+            setInterval(() => {
+                _demo(account_id);
+            }, 5000);
+        };
+        opts.account_ids.forEach(run_demo);
     });
 
     function _demo(account_id) {
@@ -46,22 +46,27 @@ export function run_demo(jQuery, document, _) {
             .done(bound_add_row);
     }
 
-    function _add_row(data) {
+    function _add_row({ account_brief }, __, request) {
         const html_template = '<tr> \
             <td> <%- moment %> </td> \
+            <td> <%- op_id %> </td> \
             <td> <%- operation %> </td> \
-            <td> <%- id %> </td> \
-            <td> <%- amount %> </td> \
-            <td> <%- final_balance %> </td> \
+            <td> <%- id_from %> </td> \
+            <td> <%= id_to %> </td> \
+            <td> <%= amount %> </td> \
+            <td> <%- balance_from %> </td> \
+            <td> <%= balance_to %> </td> \
         </tr>';
 
-        const account_brief = data.account_brief;
         const table_row = {
             moment: new Date().toLocaleString(),
-            operation: this.operation.toUpperCase(),
-            id: account_brief.id,
-            amount: this.amount || '-',
-            final_balance: account_brief.balance
+            op_id: request.getResponseHeader('X-Request-ID').replace(/^(.{6}).+(.{4})$/, '$1…$2'),
+            operation: opts.ops_abbrs[this.operation].toUpperCase(),
+            id_from: account_brief.id.replace(/^(.{4}).+(.{6})$/, '$1…$2'),
+            id_to: '&mdash;',
+            amount: this.amount || '&mdash;',
+            balance_from: account_brief.balance,
+            balance_to: '&mdash;'
         };
         const format = _.template(html_template);
         const filled_template = format(table_row);

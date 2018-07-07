@@ -112,7 +112,8 @@ function create_swagger_opts({ infra, configs, contexts, treasurer }) {
 }
 
 
-// tid 5ae727e310184a24eabab171
+// zid 1 5ae727e310184a24eabab171
+// zid 2 5b408daf597b9c38ee35fe2e
 
 
 // TODO ask for benalu npm update or post a private npm
@@ -120,5 +121,4 @@ function create_swagger_opts({ infra, configs, contexts, treasurer }) {
 
 // TODO eslint: remove and ban console.console.log();
 // TODO ban string literals, move to config
-// TODO eslint: semi? https://eslint.org/docs/rules/semi
 // TODO convert to es6 modules
