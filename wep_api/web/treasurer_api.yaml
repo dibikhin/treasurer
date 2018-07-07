@@ -247,7 +247,6 @@ definitions:
     required:
     - "code"
     - "detail"
-    #- "timestamp"
     - "title"
     properties:
       code:
@@ -257,8 +256,6 @@ definitions:
         type: "string"
       detail:
         type: "string"
-    #  timestamp:
-    #    $ref: "#/definitions/date_time"
   WithdrawalRequest:
     type: "object"
     required:
@@ -306,35 +303,25 @@ definitions:
     type: "object"
     required:
     - "from"
-    # - "timestamp"
     - "to"
     properties:
       from:
-        $ref: "#/definitions/AccountBrief"
+        $ref: "#/definitions/TreasurerResponse"
       to:
-        $ref: "#/definitions/AccountBrief"
-      timestamp:
-        $ref: "#/definitions/date_time"
+        $ref: "#/definitions/TreasurerResponse"
   TreasurerResponse:
     type: "object"
     required:
     - "account_brief"
-    # - "timestamp"
     properties:
       account_brief:
         $ref: "#/definitions/AccountBrief"
-      # timestamp:
-        # $ref: "#/definitions/date_time"
   account_id:
     type: "string"
     example: "5ae727e310184a24eabab171"
   amount:
     type: "number"
     example: 1.25
-  date_time:
-    type: "string"
-    format: "date-time"
-    description: "read only"
 parameters:
   account_id:
     name: "account_id"

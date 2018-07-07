@@ -115,6 +115,8 @@ function create_swagger_opts({ infra, configs, contexts, treasurer }) {
 // zid 1 5ae727e310184a24eabab171
 // zid 2 5b408daf597b9c38ee35fe2e
 
+// DEBUG=swagger-tools:middleware:*
+
 
 // TODO ask for benalu npm update or post a private npm
 // TODO play with "javascript.implicitProjectConfig.checkJs": true

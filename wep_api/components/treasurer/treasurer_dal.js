@@ -15,7 +15,7 @@ module.exports = {
  */
 async function get_balance({ driver, accounts }, { account_id }) {
     const account_mongo_id = new driver.ObjectID(account_id)
-    return await accounts.findOne({ _id: account_mongo_id })
+    return accounts.findOne({ _id: account_mongo_id })
 }
 
 /**
@@ -27,7 +27,7 @@ async function get_balance({ driver, accounts }, { account_id }) {
  */
 async function inc_balance(ctx, { account_id, incoming: amount }) {
     const inc_balance_params = { account_id, amount }
-    return await _inc_balance(ctx, inc_balance_params)
+    return _inc_balance(ctx, inc_balance_params)
 }
 
 /**
@@ -41,7 +41,7 @@ async function dec_balance(ctx, { account_id, outgoing }) {
     const dec_balance_params = {
         account_id, amount: - outgoing // 'minus' is for mongo
     }
-    return await _inc_balance(ctx, dec_balance_params)
+    return _inc_balance(ctx, dec_balance_params)
 }
 
 /**

@@ -7,10 +7,13 @@ function run(ctx, opts, done) {
         ctx.swagger_doc, function initializeMiddleware_callback(middleware) {
             ctx.connect.use(middleware.swaggerMetadata()) // should be first
             ctx.connect.use(middleware.swaggerValidator(opts.validator))
-
             ctx.connect.use(function generalize_params(req, res, next) {
                 // TODO holy shit
                 req.params = (req.swagger && ((req.swagger.params.body && req.swagger.params.body.value) || req.swagger.params))
+                next()
+            })
+            ctx.connect.use(function move_op_id(req, res, next) {
+                req.params.op_id = req.op_id
                 next()
             })
             ctx.connect.use(middleware.swaggerUi())
