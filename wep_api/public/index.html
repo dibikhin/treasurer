@@ -27,9 +27,9 @@
 <body>
     <div class="container">
         <h1>Treasurer Demo
-            <span class="badge badge-info">v.0.1.0 5/14/2018</span>
+            <span class="badge badge-info">v.0.1.0 7/7/2018</span>
         </h1>
-        <p class="lead">New operation every second: Balance, Withdraw or Deposit. Stare below or check Swagger
+        <p class="lead">New op every second: Balance, Withdraw, Deposit or Transfer. Stare below or check Swagger
             <a target="_blank" href="/docs">
                 docs
             </a>
@@ -43,14 +43,22 @@
                     <thead>
                         <tr>
                             <th scope="col">Moment</th>
+                            <th scope="col">Transaction Id</th>
                             <th scope="col">Operation</th>
-                            <th scope="col">Id</th>
+                            <th scope="col">Id From</th>
+                            <th scope="col">Id To</th>
                             <th scope="col">Amount</th>
-                            <th scope="col">Final Balance</th>
+                            <th scope="col">Balance</th>
+                            <th scope="col">Balance</th>
+                            <th scope="col">Currency</th>
                         </tr>
                     </thead>
                     <tbody id="ops">
                         <tr class="invisible">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -74,8 +82,16 @@
 
     <script type="module">
         import { run_demo } from '/js/main.js';
-
-        run_demo($, document, _);
+        const opts = {
+            account_ids: ['5b408daf597b9c38ee35fe2e', '5ae727e310184a24eabab171'],
+            ops_abbrs: {
+                balance: 'bal',
+                deposit: 'dep',
+                withdraw: 'w/d',
+                transfer: 'trf'
+            }
+        };
+        run_demo($, document, _, opts);
     </script>
 
 </body>

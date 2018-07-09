@@ -17,7 +17,7 @@ module.exports = {
  * @param {string}      params.op_id        Correlation Id
  */
 async function balance({ Dal }, params) {
-    return await Dal.get_balance(params)
+    return Dal.get_balance(params)
 }
 
 /**
@@ -29,7 +29,7 @@ async function balance({ Dal }, params) {
  * @param {string}      params.incoming     Decimal amount to store as string
  */
 async function deposit({ Dal }, params) {
-    return await Dal.inc_balance(params)
+    return Dal.inc_balance(params)
 }
 
 /**
@@ -47,7 +47,7 @@ async function withdraw({ Dal, Model, is_payable }, { op_id, account_id, outgoin
     if (!is_payable(threshold_params)) {
         throw new Error('insufficient funds') // TODO -> configs
     }
-    return await Dal.dec_balance({ op_id, account_id, outgoing })
+    return Dal.dec_balance({ op_id, account_id, outgoing })
 }
 
 /**
@@ -58,12 +58,12 @@ async function withdraw({ Dal, Model, is_payable }, { op_id, account_id, outgoin
  * @param {ObjectID}    params.to       Reciever's account id
  * @param {string}      params.tranche  Decimal amount to transfer as string
  */
-async function transfer({ Model }, { from, to, tranche }) {
+async function transfer({ Model }, { op_id, from, to, tranche }) {
     const params_from = {
-        account_id: from, outgoing: tranche
+        op_id, account_id: from, outgoing: tranche
     }
     const params_to = {
-        account_id: to, incoming: tranche
+        op_id, account_id: to, incoming: tranche
     }
     const acc_from_after_withdraw = await Model.withdraw(params_from)
     const acc_to_after_deposit = await Model.deposit(params_to)
