@@ -65,10 +65,8 @@ async function transfer({ Model }, { op_id, from, to, tranche }) {
     const params_to = {
         op_id, account_id: to, incoming: tranche
     }
-    const acc_from_after_withdraw = await Model.withdraw(params_from)
-    const acc_to_after_deposit = await Model.deposit(params_to)
     return {
-        from: acc_from_after_withdraw,
-        to: acc_to_after_deposit
+        from: await Model.withdraw(params_from),
+        to: await Model.deposit(params_to)
     }
 }

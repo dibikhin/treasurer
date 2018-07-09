@@ -12,10 +12,24 @@ function run(ctx, opts, done) {
                 req.params = (req.swagger && ((req.swagger.params.body && req.swagger.params.body.value) || req.swagger.params))
                 next()
             })
-            ctx.connect.use(function move_op_id(req, res, next) {
-                req.params.op_id = req.op_id
-                next()
+            // ctx.connect.use(function move_op_id(req, res, next) {
+            //     req.params.op_id = req.op_id
+            //     next()
+            // }) TODO test
+
+            // TODO qasdf
+            // TODO dev only! prod needed
+            ctx.connect.use(function (err, req, res, next) { // eslint-disable-line no-unused-vars
+                const error_response = {
+                    code: 12345, title: 'Uhhh! Error', detail: err.message
+                }
+
+                res.statusCode = res.statusCode || 500
+                res.json(error_response)
             })
+
+            // http://localhost:8080/v0/treasurer/balance/5ae727e310184a24eabab17
+
             ctx.connect.use(middleware.swaggerUi())
             ctx.connect.use(middleware.swaggerRouter(opts)) // should be last
 

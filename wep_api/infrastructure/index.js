@@ -7,8 +7,6 @@ module.exports.web.helpers = require('./web/helpers')
 
 module.exports.helpers = require('./helpers')
 
-// module.exports.advice.error_handling_strategy = require('./advice/error_handling_strategy')
-
 module.exports.advice = {
     params_validator: require('./advice/params_validator')
 }
@@ -20,5 +18,6 @@ module.exports.ajv = {
 
 module.exports.aspects_factories = {
     params_freezer_factory: require('./aspects_factories/params_freezer_factory'),
-    params_validator_factory: require('./aspects_factories/params_validator_factory')
+    params_validator_factory: require('./aspects_factories/params_validator_factory'),
+    error_handler_factory: require('./aspects_factories/error_handler_factory')
 }

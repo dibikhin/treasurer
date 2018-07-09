@@ -14,6 +14,7 @@ module.exports = {
  * @param {object} ctx.driver
  */
 async function get_balance({ driver, accounts }, { account_id }) {
+    // throw new Error('asdf')
     const account_mongo_id = new driver.ObjectID(account_id)
     return accounts.findOne({ _id: account_mongo_id })
 }

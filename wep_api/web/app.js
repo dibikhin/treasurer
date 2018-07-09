@@ -2,8 +2,10 @@ module.exports = {
     configure
 }
 
-function configure({ app, favicon, serve_static, no_cache, cors, json, generate_op_id }) {
+// TODO ertert
+function configure({ morgan, winston, app, favicon, serve_static, no_cache, cors, json, generate_op_id }) { // eslint-disable-line no-unused-vars
     app.use(no_cache()) // should be first
+    // app.use(morgan('combined', { stream: winston.stream })) // TODO
     app.use(favicon('public/favicon.ico'))
     app.use(serve_static('public'))
     app.use(cors())

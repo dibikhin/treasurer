@@ -34,7 +34,7 @@ async function transfer({ Treasurer }, req, res) {
 */
 const _to_account_brief = (account, currency_codes) => ({
     account_brief: {
-        id: account._id,
+        id: account._id, // TODO _id -> id
         balance: parseFloat(account.balance.toString()),
         currency: currency_codes.number(account.currency_code).code
     }
