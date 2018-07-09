@@ -75,6 +75,33 @@ paths:
           $ref: "#/responses/ErrorNotFound"
         500:
           $ref: "#/responses/ErrorServerError"
+  /treasurer/transfer:
+    post:
+      tags:
+      - "treasurer"
+      summary: "transfer funds"
+      description: "Returns the accounts brief after transfer"
+      operationId: "transfer"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Object with parameters of transfer"
+        required: true
+        schema:
+          $ref: "#/definitions/TransferRequest"
+      responses:
+        200:
+          $ref: "#/responses/TreasurerTransferOK"
+        400:
+          $ref: "#/responses/ErrorBadRequest"
+        404:
+          $ref: "#/responses/ErrorNotFound"
+        500:
+          $ref: "#/responses/ErrorServerError"
   /treasurer/balance/{account_id}:
     get:
       tags:
@@ -102,7 +129,6 @@ definitions:
     - "code"
     - "title"
     - "detail"
-    - "timestamp"
     additionalProperties: false
     properties:
       code:
@@ -112,8 +138,6 @@ definitions:
         type: "string"
       detail:
         type: "string"
-      timestamp:
-        $ref: "#/definitions/date_time"
   WithdrawalRequest:
     type: "object"
     required:
@@ -136,6 +160,20 @@ definitions:
         $ref: "#/definitions/account_id"
       incoming:
         $ref: "#/definitions/amount"
+  TransferRequest:
+    type: "object"
+    required:
+    - "from"
+    - "to"
+    - "tranche"
+    additionalProperties: false
+    properties:
+      from:
+        $ref: "#/definitions/account_id"
+      to:
+        $ref: "#/definitions/account_id"
+      tranche:
+        $ref: "#/definitions/amount"
   AccountBrief:
     type: "object"
     required:
@@ -147,17 +185,25 @@ definitions:
         $ref: "#/definitions/account_id"
       balance:
         $ref: "#/definitions/amount"
+  TreasurerTransferResponse:
+    type: "object"
+    required:
+    - "from"
+    - "to"
+    additionalProperties: false
+    properties:
+      from:
+        $ref: "#/definitions/TreasurerResponse"
+      to:
+        $ref: "#/definitions/TreasurerResponse"
   TreasurerResponse:
     type: "object"
     required:
     - "account_brief"
-    - "timestamp"
     additionalProperties: false
     properties:
       account_brief:
         $ref: "#/definitions/AccountBrief"
-      timestamp:
-        $ref: "#/definitions/date_time"
   account_id:
     type: "string"
     minLength: 24
@@ -168,10 +214,6 @@ definitions:
     # format: "decimal"
     minimum: 0
     example: 1.25
-  date_time:
-    type: "string"
-    format: "date-time"
-    description: "read only"
 parameters:
   account_id:
     name: "account_id"
@@ -186,6 +228,15 @@ responses:
     description: "Successful operation"
     schema:
       $ref: "#/definitions/TreasurerResponse"
+    headers:
+      X-Request-ID:
+        type: "string"
+        format: "uuid"
+        description: "correlation Id"
+  TreasurerTransferOK:
+    description: "Successful transfer operation"
+    schema:
+      $ref: "#/definitions/TreasurerTransferResponse"
     headers:
       X-Request-ID:
         type: "string"
@@ -222,3 +273,4 @@ responses:
 # TODO 402 ?
 # TODO 503 ?
 # TODO threshold_amount negative|0|positive
+# TODO amount positive
