@@ -1,133 +1,5 @@
-/**
- * Entry point
- * @module bootstrapper
- */
-
-console.info('Starting...')
-
-const uuidv1 = require('uuid/v1')
-const benalu = require('lib/benalu/benalu') // self built, due to an old npm
-const ajv = require('ajv')
-const morgan = require('morgan')
-
-const mongodb = require('mongodb')
-
-const http = require('http')
-
-const serve_static = require('serve-static')
-const no_cache = require('nocache')
-const favicon = require('serve-favicon')
-const cors = require('cors')
-const _connect = require('connect')
-const connect = _connect()
-
-const json = require('res-json')
-const js_yaml = require('js-yaml')
-const fs = require('fs')
-
-const swagger_tools = require('swagger-tools')
-
-const infra = require('infrastructure')
-
-const configs = require('configs')
-
-const web = require('web')
-const treasurer = require('components/treasurer')
-const db = require('components/db')
-
-const bootstrapper = { run }
+const bootstrapper = require('bootstrapper')
 bootstrapper.run()
-
-async function run() {
-    const contexts = {}
-    contexts.treasurer = {}
-    contexts.treasurer_aop = {}
-    contexts.treasurer.dal = { driver: mongodb }
-
-    await db.connect(contexts.treasurer.dal, configs.mongo)
-
-    configs.treasurer = {}
-    configs.treasurer.params_validators = configs.ajv.configure({
-        ajv, infra, mongo_is_valid: mongodb.ObjectID.isValid, schemas: treasurer.params_schemas
-    })
-
-    configure_web_app({ web, configs, contexts })
-    configure_swagger({ configs, contexts })
-
-    const treasurer_controller_proxy = prepare_contexts({ infra, configs, contexts, treasurer })
-    // WARN spaghetti references?
-    contexts.treasurer.model.Model = contexts.app.Treasurer
-
-    const swagger_opts = configs.web.to_swagger_opts(configs.web, treasurer_controller_proxy)
-    return web.swagger.run(contexts.swagger, swagger_opts, web.server.run)
-}
-
-/**
- * privates
- */
-
-function configure_web_app({ web, configs, contexts }) {
-    contexts.middleware = {
-        morgan, winston: configs.winston, app: connect, favicon, serve_static, no_cache, cors, json, generate_op_id: uuidv1
-    }
-    return web.app.configure(contexts.middleware)
-}
-
-function configure_swagger({ configs, contexts }) {
-    const swagger_doc = configs.web.swagger.configure_doc({
-        fs, js_yaml, port: configs.web.port, swagger: configs.web.swagger
-    })
-    contexts.swagger = {
-        http, connect, swagger_tools, swagger_doc
-    }
-}
-
-function prepare_contexts({ infra, configs, contexts, treasurer }) {
-    // bake dal
-    const treasurer_dal_baked = infra.helpers.bake_context(treasurer.dal, contexts.treasurer.dal)
-    contexts.treasurer_aop.dal = {
-        infra,
-        logger: configs.winston,
-        aop_provider: benalu,
-        target: treasurer_dal_baked,
-        params_validators: configs.treasurer.params_validators
-    }
-    const treasurer_dal_proxy = infra.aop.factory.create(contexts.treasurer_aop.dal)
-    contexts.treasurer.model = {
-        Dal: treasurer_dal_proxy,
-        is_payable: treasurer.threshold_strategy
-    }
-    // bake model
-    // WARN bake -> aopize -> use
-    const treasurer_model_baked = infra.helpers.bake_context(treasurer.model, contexts.treasurer.model)
-    contexts.treasurer_aop.model = {
-        infra,
-        logger: configs.winston,
-        aop_provider: benalu,
-        target: treasurer_model_baked,
-        params_validators: configs.treasurer.params_validators
-    }
-    const treasurer_model_proxy = infra.aop.factory.create(contexts.treasurer_aop.model)
-    contexts.app = {
-        Treasurer: treasurer_model_proxy
-    }
-
-    const controller = infra.web.helpers.prepare_controller(configs.web.treasurer_controller_prefix, treasurer.controller)
-    // bake controller
-    const treasurer_controller_baked = infra.helpers.bake_context(controller, contexts.app)
-    contexts.treasurer_aop.controller = {
-        infra,
-        logger: configs.winston,
-        aop_provider: benalu,
-        target: treasurer_controller_baked,
-        params_validators: configs.treasurer.params_validators
-    }
-    const treasurer_controller_proxy = infra.aop.factory.create(contexts.treasurer_aop.controller)
-    return treasurer_controller_proxy
-}
-
-// TODO erghrtfgh
-process.on('unhandledRejection', function handle_unhandled(reason) { throw reason })
 
 
 // zid 1 5ae727e310184a24eabab171
@@ -139,8 +11,17 @@ process.on('unhandledRejection', function handle_unhandled(reason) { throw reaso
 // TODO ask for benalu npm update or post a private npm
 // TODO play with "javascript.implicitProjectConfig.checkJs": true
 
-// TODO ban string literals, move to config
-// TODO convert to es6 modules
+// TODO ban string literals, move to resources
+// TODO ? convert to es6 modules ?
 
 
 // TODO eslint: remove and ban console.console.log() TODO
+
+// TODO tune demo for less requests more meaning
+
+// TODO clear all eslint-disable
+// TODO add demo page to readme.md
+// TODO rename run() funcs
+// TODO review wrappers stack and approach
+// TODO swagger response validation fails in the self way
+// TODO ask Eduard Rjp for review

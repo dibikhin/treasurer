@@ -6,7 +6,7 @@ function init() {
     const options = {
         file: {
             level: 'debug',
-            filename: '/home/roman/projects/treasurer/wep_api/logs/app.log',
+            filename: '/home/roman/projects/treasurer/wep_api/logs/app.log', // TODO
             handleExceptions: true,
             json: true,
             maxsize: 5242880, // 5MB
@@ -16,7 +16,7 @@ function init() {
         console: {
             level: 'debug',
             handleExceptions: true,
-            // format: winston.format.simple(),
+            format: winston.format.simple(),
             json: false,
             colorize: true,
         },

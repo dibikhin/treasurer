@@ -14,7 +14,6 @@ module.exports = {
  * @param {object} ctx.driver
  */
 async function get_balance({ driver, accounts }, { account_id }) {
-    // throw new Error('asdf')
     const account_mongo_id = new driver.ObjectID(account_id)
     return accounts.findOne({ _id: account_mongo_id })
 }
@@ -47,10 +46,6 @@ async function dec_balance(ctx, { account_id, outgoing }) {
 
 /**
  * @private
- *
- * @param {any} { accounts, driver }
- * @param {any} { account_id, amount }
- * @returns {object} account
  */
 async function _inc_balance({ accounts, driver }, { account_id, amount }) {
     const { value: account } = await accounts

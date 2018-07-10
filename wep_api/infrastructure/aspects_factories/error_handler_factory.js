@@ -1,14 +1,10 @@
-const util = require('util')
-
 module.exports = create
 
-function create({ logger }) {
-    return async function error_handler_aspect(invocation) {
-        try {
-            return await invocation.proceed()
-        } catch (err) {
-            logger.error('sdfgsdfgsdfg')
-            logger.error(util.inspect(err))
-        }
+function create() {
+    return function error_handler_aspect(invocation) {
+
+        // TODO put error handling here?
+
+        return invocation.proceed()
     }
 }

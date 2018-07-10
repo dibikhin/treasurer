@@ -1,3 +1,5 @@
 module.exports.app = require('./app')
 module.exports.server = require('./server')
 module.exports.swagger = require('./swagger')
+module.exports.helpers = require('./helpers')
+module.exports.error_handlers = require('./error_handlers')
