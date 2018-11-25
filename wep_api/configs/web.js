@@ -3,15 +3,15 @@ module.exports = _init()
 function _init() {
     const web = { to_swagger_opts }
     web.port = process.env.PORT || 8080
-    web.treasurer_controller_prefix = 'treasurer_controller_'
+    web.treasurer_controller_prefix = 'treasurer_controller_' // starts like in swagger.yaml
 
     web.swagger = {
         ui_path: 'web/treasurer_api.yaml',
         controllers_path: 'components/treasurer/controllers',
         use_stubs: false,
-        compose_host: compose_host,
-        validator: { validateResponse: true },
-        configure_doc
+        compose_host,
+        configure_doc,
+        validator: { validateResponse: true }
     }
     return web
 }

@@ -24,5 +24,7 @@
     "window.restoreFullscreen": true,
     "editor.tabCompletion": true,
     "editor.codeLens": true,
-    "editor.suggestSelection": "recentlyUsedByPrefix"
+    "editor.suggestSelection": "recentlyUsedByPrefix",
+    "todo-tree.expanded": true,
+    "todo-tree.flat": true
 }
