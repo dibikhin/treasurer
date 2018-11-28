@@ -1,20 +1,26 @@
+const json = require('res-json')
+const cors = require('cors')
+const serve_static = require('serve-static')
+const no_cache = require('nocache')
+const favicon = require('serve-favicon')
+
 module.exports = {
     configure
 }
 
-function configure({ morgan, logger, app, favicon, serve_static, no_cache, cors, json, generate_op_id }) { // eslint-disable-line no-unused-vars
-    app.use(no_cache()) // should be first
+function configure({ logger, connect, generate_op_id }) { // eslint-disable-line no-unused-vars
+    connect.use(no_cache()) // should be first
     // app.use(morgan('combined', { stream: logger.stream })) TODO
-    app.use(favicon('public/favicon.ico'))
-    app.use(serve_static('public'))
-    app.use(cors())
-    app.use(json())
+    connect.use(favicon('public/favicon.ico'))
+    connect.use(serve_static('public'))
+    connect.use(cors())
+    connect.use(json())
 
-    app.use(function set_op_id(req, res, next) {
+    connect.use(function set_op_id(req, res, next) {
         req.op_id = _get_op_id({ req, generate_op_id })
         return next()
     })
-    app.use(function set_headers(req, res, next) {
+    connect.use(function set_headers(req, res, next) {
         res.setHeader('X-Request-ID', req.op_id)
         return next()
     })

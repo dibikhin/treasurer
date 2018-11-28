@@ -1,10 +1,10 @@
 /**
- * @module ErrorHandlingStrategy
+ * @module WebErrorHandlingStrategy
  */
 
 const util = require('util')
 const HttpStatus = require('http-status-codes')
-const user_messages = require('resources').user_messages
+const error_names = require('resources/').error_names
 
 const error_handlers = [
     handle_not_implemented,
@@ -21,7 +21,7 @@ function handle_not_implemented(req, res) {
     res.statusCode = HttpStatus.NOT_IMPLEMENTED
     const error_response = {
         code: 76543, title: HttpStatus.getStatusText(res.statusCode),
-        detail: user_messages.MISHIT
+        detail: error_names.MISHIT
     }
     return res.json(error_response)
 }

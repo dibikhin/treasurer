@@ -17,7 +17,7 @@ module.exports = {
  * @param {string}      params.op_id        Correlation Id
  */
 async function balance({ Dal, Errors }, params) {
-    return await Dal.get_balance(params) || Errors.not_found_error(params.account_id)
+    return await Dal.get_balance(params) || Errors.account_not_found_error(params.account_id)
 }
 
 /**
@@ -29,7 +29,7 @@ async function balance({ Dal, Errors }, params) {
  * @param {string}      params.incoming     Decimal amount to store as string
  */
 async function deposit({ Dal, Errors }, params) {
-    return await Dal.inc_balance(params) || Errors.not_found_error(params.account_id)
+    return await Dal.inc_balance(params) || Errors.account_not_found_error(params.account_id)
 }
 
 /**
@@ -43,7 +43,7 @@ async function deposit({ Dal, Errors }, params) {
 async function withdraw({ Dal, Model, Rules, Errors }, { op_id, account_id, outgoing }) {
     const account = await Model.balance({ op_id, account_id })
     Rules.is_account_payable({ account, outgoing }) || Errors.insufficient_funds_error(account_id)
-    return await Dal.dec_balance({ op_id, account_id, outgoing }) || Errors.not_found_error(account_id)
+    return await Dal.dec_balance({ op_id, account_id, outgoing }) || Errors.account_not_found_error(account_id)
 }
 
 /**

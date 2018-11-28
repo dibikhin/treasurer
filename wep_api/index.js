@@ -1,5 +1,5 @@
 const bootstrapper = require('bootstrapper')
-bootstrapper.run()
+void bootstrapper.run()
 
 
 // zid 1 5ae727e310184a24eabab171
@@ -20,8 +20,8 @@ bootstrapper.run()
 // TODO tune demo for less requests more meaning
 
 // TODO clear all eslint-disable
+// TODO limit closures, are leaking
 // TODO add demo page to readme.md
-// TODO rename run() funcs
 // TODO review wrappers stack and approach
 // TODO swagger response validation fails in the self way
 // TODO ask Eduard Rjp for review
