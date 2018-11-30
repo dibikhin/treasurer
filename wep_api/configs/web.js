@@ -10,7 +10,7 @@ function _init() {
 
     web.swagger = {
         ui_path: 'web/treasurer_api.yaml',
-        controllers_path: 'components/treasurer/controllers',
+        controllers_path: 'components/treasurer/controllers', // WARN why nowhere works?
         use_stubs: false,
         compose_host,
         configure_doc,

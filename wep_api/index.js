@@ -11,8 +11,7 @@ void bootstrapper.run()
 // TODO ask for benalu npm update or post a private npm
 // TODO play with "javascript.implicitProjectConfig.checkJs": true
 
-// TODO ban string literals, move to resources
-// TODO ? convert to es6 modules ?
+// TODO ban string literals
 
 
 // TODO eslint: remove and ban console.console.log() TODO

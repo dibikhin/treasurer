@@ -50,7 +50,7 @@ async function withdraw({ Dal, Model, Rules, Errors }, { op_id, account_id, outg
  * Moves funds to another account
  * @param {object}      ctx             Injected params
  * @param {object}      params
- * @param {ObjectID}    params.from     Sender's account id TODO Creditor
+ * @param {ObjectID}    params.from     Sender's account id Creditor
  * @param {ObjectID}    params.to       Reciever's account id TODO Debitor
  * @param {string}      params.tranche  Decimal amount to transfer as string
  */

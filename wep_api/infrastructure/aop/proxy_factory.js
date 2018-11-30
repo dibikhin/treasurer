@@ -1,3 +1,7 @@
+/**
+ * @module proxy_factory
+ */
+
 const { forEach } = require('ramda')
 
 module.exports = {

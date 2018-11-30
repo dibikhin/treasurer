@@ -1,42 +1,46 @@
+/**
+ * @module component_factory
+ */
+
 module.exports = {
     create
 }
 
-function create({ core_deps, infra, configs, web, contexts, component }) {
-    contexts[component.name] = {}
-    contexts[component.name].dal = { driver: core_deps.driver }
+function create({ core_deps, infra, configs, component }) {
+    const { driver, aop_provider } = core_deps
+    const component_context = {}
+    const proxys = {}
 
-    const dal_proxy = proxify_baked_dal({ core_deps, infra, contexts, component })
-    contexts[component.name].model = {
+    component_context.dal = {
+        driver
+    }
+
+    proxys.dal = proxify_baked_dal({ aop_provider, infra, component_context, component })
+    component_context.model = {
         Errors: component.errors,
-        Dal: dal_proxy,
+        Dal: proxys.dal,
         Model: null,
         Rules: component.rules
     }
 
-    const model_proxy = proxify_baked_model({ core_deps, infra, contexts, configs, component })
-    contexts[component.name].controller = {
-        Model: model_proxy
+    proxys.model = proxify_baked_model({ aop_provider, infra, component_context, configs, component })
+    component_context.controller = {
+        Model: proxys.model
     }
-    contexts[component.name].model.Model = model_proxy // model should run own fully 'charged' functions too
 
-    Object.freeze(contexts) // TODO freeze deeper
+    proxys.controller = proxify_baked_controller({ aop_provider, infra, component_context, configs, component })
+    component_context.controller_proxy = proxys.controller
 
-    const controller = web.helpers.prepare_controller({
-        logger: configs.logger, prefix: configs.web.controller_prefix,
-        controller: component.controller, error_handling_strategy: infra.error_handling_strategy,
-    })
-    const controller_proxy = proxify_baked_controller({
-        core_deps, infra, contexts, configs, controller, component
-    })
-    return controller_proxy
+    component_context.model.Model = proxys.model // model should run own 'fully charged' functions too
+
+    return component_context
 }
 
 // TODO below: generalize and move to The Framework
-function proxify_baked_dal({ core_deps, infra, contexts, component }) {
-    const dal_baked = infra.di.inject_first_param(component.dal, contexts[component.name].dal)
+function proxify_baked_dal({ aop_provider, infra, component_context, component }) {
+    const dal_baked = infra.di.inject_first_param_to_each(component.dal, component_context.dal)
     const dal_proxy = infra.aop.proxy_factory.create({
-        aop_provider: core_deps.benalu,
+        aop_provider,
         target: dal_baked,
         interceptors: [
             infra.aspects_factories.params_freezer_factory({
@@ -47,10 +51,10 @@ function proxify_baked_dal({ core_deps, infra, contexts, component }) {
     return dal_proxy
 }
 
-function proxify_baked_model({ core_deps, infra, contexts, configs, component }) {
-    const model_baked = infra.di.inject_first_param(component.model, contexts[component.name].model)
+function proxify_baked_model({ aop_provider, infra, component_context, configs, component }) {
+    const model_baked = infra.di.inject_first_param_to_each(component.model, component_context.model)
     const model_proxy = infra.aop.proxy_factory.create({
-        aop_provider: core_deps.benalu,
+        aop_provider,
         target: model_baked,
         interceptors: [
             infra.aspects_factories.params_freezer_factory({
@@ -65,10 +69,10 @@ function proxify_baked_model({ core_deps, infra, contexts, configs, component })
     return model_proxy
 }
 
-function proxify_baked_controller({ core_deps, infra, contexts, configs, controller, component }) {
-    const controller_baked = infra.di.inject_first_param(controller, contexts[component.name].controller)
+function proxify_baked_controller({ aop_provider, infra, component_context, configs, component }) {
+    const controller_baked = infra.di.inject_first_param_to_each(component.controller, component_context.controller)
     const controller_proxy = infra.aop.proxy_factory.create({
-        aop_provider: core_deps.benalu,
+        aop_provider,
         target: controller_baked,
         interceptors: [
             infra.aspects_factories.error_handler_factory({ logger: configs.logger })
