@@ -96,6 +96,9 @@ function configure_swagger({ core_deps, configs, contexts }) {
     }
 }
 
+/**
+ * Controller factory
+ */
 function configure_controller({ infra, web, configs, treasurer }) {
     const prepared_controller = web.helpers.prepare_controller({
         logger: configs.logger, prefix: configs.web.controller_prefix,
