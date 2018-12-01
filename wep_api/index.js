@@ -18,6 +18,8 @@ void bootstrapper.run()
 
 // TODO tune demo for less requests more meaning
 
+// TODO rename 'controller' to 'web_api'
+
 // TODO clear all eslint-disable
 // TODO limit closures, are leaking
 // TODO add demo page to readme.md
