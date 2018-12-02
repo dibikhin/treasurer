@@ -1,4 +1,6 @@
-module.exports = { configure }
+module.exports = {
+    configure
+}
 
 /**
  * Factory of strategies

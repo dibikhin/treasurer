@@ -5,7 +5,9 @@
 
 const { assoc } = require('ramda')
 
-module.exports = { run }
+module.exports = {
+    run
+}
 
 function run() {
     console.info('Starting...')
@@ -17,7 +19,7 @@ function run() {
     const configs = require('configs/')
     const web = require('web/')
 
-    const component_factory = require('component_factory')
+    const component_infra = require('component_infra')
 
     const treasurer = require('components/treasurer/')
     const db = require('components/db')
@@ -29,18 +31,21 @@ function run() {
     process.on('unhandledRejection', function throw_unhandled(reason) { throw reason })
 
 
-    return void run_app({ core_deps, infra, configs, web, component_factory, treasurer, db })
+    return void run_app({ core_deps, infra, configs, web, component_infra, treasurer, db })
 }
 
 /**
  * @private
  */
-async function run_app({ core_deps, infra, configs, web, component_factory, treasurer, db }) {
+async function run_app({ core_deps, infra, configs, web, component_infra, treasurer, db }) {
     const contexts = {}
 
     configs.treasurer = {}
     configs.treasurer.params_validators = configs.ajv.configure({
         ajv: core_deps.ajv, infra, mongo_is_valid: core_deps.mongodb.ObjectID.isValid, schemas: treasurer.params_schemas
+    })
+    configs.treasurer.aspects = treasurer.aspects_configs.create({
+        params_validators: configs.treasurer.params_validators, logger: configs.logger
     })
     Object.freeze(configs) // TODO freeze deeper
 
@@ -48,8 +53,11 @@ async function run_app({ core_deps, infra, configs, web, component_factory, trea
     configure_swagger({ core_deps, configs, contexts })
     const treasurer_component = configure_controller({ infra, web, configs, treasurer, })
 
-    const treasurer_component_context = component_factory.create({
-        core_deps, infra, configs, web, contexts, component: treasurer_component
+    const component_interceptors = component_infra.component_interceptors_factory.create({
+        infra, aspects_configs: configs.treasurer.aspects, component_infra
+    })
+    const treasurer_component_context = component_infra.component_factory.create({
+        core_deps, infra, component_interceptors, web, contexts, component: treasurer_component
     })
     contexts.treasurer = treasurer_component_context
 
@@ -97,7 +105,7 @@ function configure_swagger({ core_deps, configs, contexts }) {
 }
 
 /**
- * Controller factory
+ * TODO move, Controller factory
  */
 function configure_controller({ infra, web, configs, treasurer }) {
     const prepared_controller = web.helpers.prepare_controller({

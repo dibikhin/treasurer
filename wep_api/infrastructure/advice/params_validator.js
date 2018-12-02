@@ -11,7 +11,7 @@ module.exports = is_params_valid
 function is_params_valid({ validate, target, member_name }) {
     const valid = validate(target)
     if (!valid) {
-        throw new Error( // TODO implement custom
+        throw new Error( // TODO implement custom, causes 500 not 400
             `params is invalid. function: ${member_name},
              params: ${util.inspect(target)},
              errors: ${util.inspect(validate.errors)}`)
