@@ -8,7 +8,7 @@ module.exports = {
     configure
 }
 
-function configure({ logger, connect, generate_op_id }) { // eslint-disable-line no-unused-vars
+function configure({ connect, generate_op_id }) {
     connect.use(no_cache()) // should be first
     // app.use(morgan('combined', { stream: logger.stream })) TODO
     connect.use(favicon('public/favicon.ico'))

@@ -16,10 +16,11 @@ function run() {
     const core_deps = load_core_deps({})
 
     const infra = require('infrastructure/')
+    const custom_infra = require('custom_infra/')
+    const component_infra = require('component_infra')
+
     const configs = require('configs/')
     const web = require('web/')
-
-    const component_infra = require('component_infra')
 
     const treasurer = require('components/treasurer/')
     const db = require('components/db')
@@ -29,7 +30,9 @@ function run() {
     // TODO move. Throw or log?
     process.on('unhandledRejection', function throw_unhandled(reason) { throw reason })
 
-    return void run_app({ core_deps, infra, configs, web, component_infra, treasurer, db })
+    return void run_app({
+        core_deps, infra, custom_infra, configs, web, component_infra, treasurer, db
+    })
 }
 
 /**
@@ -37,12 +40,14 @@ function run() {
  */
 
 // TODO refactor, too long, too complex
-async function run_app({ core_deps, infra, configs, web, component_infra, treasurer, db }) {
+async function run_app({
+    core_deps, infra, custom_infra, configs, web, component_infra, treasurer, db
+}) {
     const contexts = {}
 
     configs.treasurer = {}
     configs.treasurer.params_validators = configs.ajv.configure({
-        ajv: core_deps.ajv, infra, mongo_is_valid: core_deps.mongodb.ObjectID.isValid, schemas: treasurer.params_schemas
+        ajv: core_deps.ajv, custom_infra, mongo_is_valid: core_deps.mongodb.ObjectID.isValid, schemas: treasurer.params_schemas
     })
     configs.treasurer.aspects = treasurer.aspects_configs.create({
         params_validators: configs.treasurer.params_validators, logger: configs.logger
