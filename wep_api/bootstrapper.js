@@ -26,10 +26,8 @@ function run() {
 
     console.info('Require: OK')
 
-
     // TODO move. Throw or log?
     process.on('unhandledRejection', function throw_unhandled(reason) { throw reason })
-
 
     return void run_app({ core_deps, infra, configs, web, component_infra, treasurer, db })
 }
@@ -70,6 +68,7 @@ async function run_app({ core_deps, infra, configs, web, component_infra, treasu
     Object.freeze(contexts) // TODO freeze deeper
 
     const swagger_opts = configs.web.to_swagger_opts(configs.web, treasurer_component_context.controller_proxy)
+
     const run_params = {
         add_error_handlers: web.helpers.add_error_handlers,
         error_handlers: web.error_handlers
