@@ -17,7 +17,8 @@
     "typescript.implementationsCodeLens.enabled": true,
     "todohighlight.keywords": [
         "TODO",
-        "WARN"
+        "WARN",
+        "NOTE",
     ],
     "spellright.notificationClass": "warning",
     "window.restoreFullscreen": true,
