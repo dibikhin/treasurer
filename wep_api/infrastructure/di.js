@@ -3,26 +3,25 @@
  * @module helpers
  */
 
-const { map, partial } = require('ramda')
+const { map, partial, partialRight } = require('ramda')
 
 module.exports = {
-    inject_first_param
+    inject_first_param_to_each
 }
 
 /**
  * Homemade dependency injection by partial application
  */
-function inject_first_param(target_module, first_param) {
-    const to_async_partial_action = action => {
-        const partial_action = partial(action, [first_param])
-        const async_action = async (...args) => partial_action(...args)
-        return async_action
-    }
-    return map(to_async_partial_action, target_module)
+function inject_first_param_to_each(target_module, first_param) {
+    const to_async_partial_action_partial = partialRight(to_async_partial_action, [first_param])
+    return map(to_async_partial_action_partial, target_module)
+}
 
-    // const partial_action = (action, first_param) => partial(action, [first_param])
-    // const async_action = action => async (...args) => action(...args)
-    // const async_partial_action = pipe(partial_action, async_action)(target_module, first_param)
-    // return map(async_partial_action, target_module)
-    // TODO refactor ^
+/**
+ * @private
+ */
+function to_async_partial_action(action, first_param) {
+    const partial_action = partial(action, [first_param])
+    const async_action = async (...args) => partial_action(...args)
+    return async_action
 }

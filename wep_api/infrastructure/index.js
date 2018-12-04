@@ -6,6 +6,9 @@ module.exports.aop = {}
 module.exports.aop.proxy_factory = require('./aop/proxy_factory')
 
 module.exports.di = require('./di')
+
+module.exports.aop_di_helper = require('./aop_di_helper')
+
 module.exports.error_handling_strategy = require('./error_handling_strategy')
 
 module.exports.advice = {

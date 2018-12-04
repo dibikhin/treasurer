@@ -243,7 +243,7 @@ describe('Treasurer. Integration tests', function () {
                     .post('/v0/treasurer/withdraw')
                     .send({
                         account_id: 'qwerty12345',
-                        incoming: 1.425
+                        outgoing: 1.425
                     })
                     .set('Accept', 'application/json')
                     .expect(HttpStatus.BAD_REQUEST)
@@ -266,7 +266,7 @@ describe('Treasurer. Integration tests', function () {
                     .post('/v0/treasurer/withdraw')
                     .send({
                         account_id: '5ae727e310184a24eabab170',
-                        incoming: 1.425
+                        outgoing: 1.425
                     })
                     .set('Accept', 'application/json')
                     .expect(HttpStatus.NOT_FOUND)
@@ -274,6 +274,7 @@ describe('Treasurer. Integration tests', function () {
                         if (err) return done(err)
 
                         const error_response = res.body
+
                         should.exist(error_response)
                         should.exist(error_response.code)
                         should.exist(error_response.title)
@@ -290,6 +291,10 @@ describe('Treasurer. Integration tests', function () {
 
 // TODO handle:
 // - 405 METHOD NOT ALLOWED httpstatuses.com/405
+
+// + valid methods + valid paths + valid params
+// - valid methods + valid paths + valid params
+// + valid methods + valid paths - valid params
 
 // - deleted (archived)
 // - suspended

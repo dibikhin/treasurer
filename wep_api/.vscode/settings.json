@@ -15,7 +15,6 @@
     "files.trimTrailingWhitespace": true,
     "javascript.referencesCodeLens.enabled": true,
     "typescript.implementationsCodeLens.enabled": true,
-    "typescript.referencesCodeLens.enabled": true,
     "todohighlight.keywords": [
         "TODO",
         "WARN"
