@@ -6,6 +6,7 @@ module.exports = {
     create
 }
 
+// TODO refactor, too long. SRP: fill contexts, bake/proxyfy build proxys.controller
 function create({ core_deps, infra, component_interceptors, component }) {
     const { driver, aop_provider } = core_deps
     const component_context = {}

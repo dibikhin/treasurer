@@ -37,6 +37,8 @@ function run() {
 /**
  * @private
  */
+
+// TODO refactor, too long, too complex
 async function run_app({ core_deps, infra, configs, web, component_infra, treasurer, db }) {
     const contexts = {}
 
@@ -104,9 +106,6 @@ function configure_swagger({ core_deps, configs, contexts }) {
     }
 }
 
-/**
- * TODO move, Controller factory
- */
 function configure_controller({ infra, web, configs, treasurer }) {
     const prepared_controller = web.helpers.prepare_controller({
         logger: configs.logger, prefix: configs.web.controller_prefix,
