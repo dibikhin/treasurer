@@ -4,8 +4,6 @@ module.exports = {
     add_keyword, compile_validators
 }
 
-// TODO move ajv-dependent smw
-
 function add_keyword(ajv, params) {
     const validator = () => data => params.is_valid(data)
     ajv.addKeyword(params.keyword, { compile: validator })

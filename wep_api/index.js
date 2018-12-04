@@ -11,18 +11,14 @@ void bootstrapper.run()
 // TODO ask for benalu npm update or post a private npm
 // TODO play with "javascript.implicitProjectConfig.checkJs": true
 
-// TODO ban string literals
-
-
+// TODO eslint: ban string literals && magic numbers
 // TODO eslint: remove and ban console.console.log() TODO
-
 // TODO tune demo for less requests more meaning
-
 // TODO rename 'controller' to 'web_api'
 
 // TODO clear all eslint-disable
 // TODO limit closures, are leaking
 // TODO add demo page to readme.md
 // TODO review wrappers stack and approach
-// TODO swagger response validation fails in the self way
+// NOTE swagger response validation fails in the self way
 // TODO ask Eduard Rjp for review
