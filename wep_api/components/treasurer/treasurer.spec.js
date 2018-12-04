@@ -23,31 +23,32 @@ context('Get Docs', function () {
     })
 })
 
-describe('Treasurer. Integration tests', function () {
-    describe('GET unknown route', function () {
-        it('responds with 501 & error response', function (done) {
-            request
-                .get('/v0/treaSureRRer/bla-Bla-bla/qwerty12345')
-                .set('Accept', 'application/json')
-                .expect(HttpStatus.NOT_IMPLEMENTED)
-                .end(function (err, res) {
-                    if (err) {
-                        console.log(res.error)
-                        return done(err)
-                    }
+describe('GET unknown route', function () {
+    it('responds with 501 & error response', function (done) {
+        request
+            .get('/v0/treaSureRRer/bla-Bla-bla/qwerty12345')
+            .set('Accept', 'application/json')
+            .expect(HttpStatus.NOT_IMPLEMENTED)
+            .end(function (err, res) {
+                if (err) {
+                    console.log(res.error)
+                    return done(err)
+                }
 
-                    const error_response = res.body
-                    should.exist(error_response.code)
-                    should.exist(error_response.title)
-                    should.exist(error_response.detail)
+                const error_response = res.body
+                should.exist(error_response.code)
+                should.exist(error_response.title)
+                should.exist(error_response.detail)
 
-                    done()
-                })
-        })
+                done()
+            })
     })
+})
+
+describe('Treasurer. Integration tests', function () {
 
     context('Get Balance of Account:', function () {
-        describe('GET balance of existing account', function () {
+        describe('Get balance of existing account', function () {
             it('responds with 200 & brief account', function (done) {
                 request
                     .get('/v0/treasurer/balance/5ae727e310184a24eabab171')
@@ -70,7 +71,7 @@ describe('Treasurer. Integration tests', function () {
             })
         })
 
-        describe('GET balance with NOT valid account_id', function () {
+        describe('Get balance with NOT valid account_id', function () {
             it('responds with 400 & error response', function (done) {
                 request
                     .get('/v0/treasurer/balance/qwerty12345')
@@ -89,7 +90,7 @@ describe('Treasurer. Integration tests', function () {
             })
         })
 
-        describe('GET balance of NOT existing account', function () {
+        describe('Get balance of NOT existing account', function () {
             it('responds with 404 & error response', function (done) {
                 request
                     .get('/v0/treasurer/balance/5ae727e310184a24eabab170')

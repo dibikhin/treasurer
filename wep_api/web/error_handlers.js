@@ -4,7 +4,9 @@
 
 const util = require('util')
 const HttpStatus = require('http-status-codes')
+
 const error_names = require('resources/').error_names
+const Errors = require('resources').Errors
 
 const error_handlers = [
     handle_not_implemented,
@@ -27,7 +29,7 @@ function handle_not_implemented(req, res) {
 }
 
 function handle_bad_request(err, req, res, next) {
-    if (is_swagger_error(err)) {
+    if (is_swagger_error(err) || err instanceof Errors.ValidationError) {
         res.statusCode = HttpStatus.BAD_REQUEST
         const error_response = {
             code: 54321, title: HttpStatus.getStatusText(res.statusCode), detail: err.message
