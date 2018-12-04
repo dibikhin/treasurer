@@ -15,7 +15,6 @@
     "files.trimTrailingWhitespace": true,
     "javascript.referencesCodeLens.enabled": true,
     "typescript.implementationsCodeLens.enabled": true,
-    "typescript.referencesCodeLens.enabled": true,
     "todohighlight.keywords": [
         "TODO",
         "WARN"
@@ -24,5 +23,7 @@
     "window.restoreFullscreen": true,
     "editor.tabCompletion": true,
     "editor.codeLens": true,
-    "editor.suggestSelection": "recentlyUsedByPrefix"
+    "editor.suggestSelection": "recentlyUsedByPrefix",
+    "todo-tree.expanded": true,
+    "todo-tree.flat": true
 }
