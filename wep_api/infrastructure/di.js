@@ -1,6 +1,5 @@
 /**
- * Helpers
- * @module helpers
+ * @module DependencyInjector
  */
 
 const { map, partial, partialRight } = require('ramda')

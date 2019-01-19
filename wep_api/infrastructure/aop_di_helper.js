@@ -1,3 +1,7 @@
+/**
+ * @aop_di_helper
+ */
+
 module.exports = {
     proxify_baked_module
 }

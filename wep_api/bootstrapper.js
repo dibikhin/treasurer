@@ -61,8 +61,11 @@ async function run_app({
     const component_interceptors = component_infra.component_interceptors_factory.create({
         infra, aspects_configs: configs.treasurer.aspects, component_infra
     })
+
+    const component_context = component_infra.component_context_factory.create({ core_deps, component: treasurer_component })
+
     const treasurer_component_context = component_infra.component_factory.create({
-        core_deps, infra, component_interceptors, web, contexts, component: treasurer_component
+        core_deps, infra, component_interceptors, component_context, component: treasurer_component
     })
     contexts.treasurer = treasurer_component_context
 
