@@ -12,7 +12,9 @@ void bootstrapper.run()
 // TODO play with "javascript.implicitProjectConfig.checkJs": true
 
 // TODO eslint: ban string literals && magic numbers
+
 // TODO eslint: remove and ban console.console.log()
+
 // TODO tune demo for less requests more meaning
 // TODO rename 'controller' to 'web_api'
 
